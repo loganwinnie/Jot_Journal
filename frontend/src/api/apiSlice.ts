@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {BaseQueryApi, FetchArgs, createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
-import { setUser, logoutUser } from "../redux/user"
+import { logoutUser } from "../redux/user"
 
 const baseQuery = fetchBaseQuery({
     baseUrl: "http://localhost:8000",
@@ -28,7 +28,5 @@ const logoutIfUnauth = async (
 
 export const apiSlice = createApi({
     baseQuery: logoutIfUnauth,
-    endpoints: builder => ({
-
-    })
+    endpoints: () => ({})
 })

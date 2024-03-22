@@ -42,7 +42,6 @@ function LoginForm({ login }: {
     try {
       await login(formData);
       setFormData({ username: "", password: "" });
-      navigate("/events");
     } catch (err) {
         if (err instanceof Array) {
         //   setErrors(err);

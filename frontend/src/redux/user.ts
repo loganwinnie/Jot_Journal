@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from './store'
+// import type { PayloadAction } from '@reduxjs/toolkit'
+// import type { RootState } from './store'
 import JournalAPI  from '../api'
 
 interface UserInterface {
@@ -34,7 +34,7 @@ const userSlice = createSlice({
         state.token = token
         JournalAPI.token = token.access_token
      },
-     logoutUser: (state, action) => {
+     logoutUser: (state) => {
         state.user = null
         state.token = null
         JournalAPI.token = null
@@ -46,6 +46,6 @@ export const {setUser, logoutUser} = userSlice.actions
 
 export default userSlice.reducer
 
-export const getUser = (state) => state.auth.user
-export const getToken = (state) => state.auth.token
+export const getUser = (state: { auth: { user: unknown; }; }) => state.auth.user
+export const getToken = (state: { auth: { token: unknown; }; }) => state.auth.token
 

@@ -29,9 +29,7 @@ interface UserInterface {
  * App
  */
 function App() {
-  const [user, setUser] = useState< UserInterface | null>(null);
   const [token, setToken] = useState(localStorage.getItem("token"));
-  const [sideBarOpen, setSideBar] = useState<boolean>(true)
   // const [isLoading, setIsLoading] = useState<boolean>(true);
 
   /** UseEffect for setting token and user.. */

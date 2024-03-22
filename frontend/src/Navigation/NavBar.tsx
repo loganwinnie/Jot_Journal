@@ -17,7 +17,7 @@ function NavBar({ logout}: NavBarComponent) {
 
   function userLoggedIn() {
     <>
-
+      
     </>
   }
 }
