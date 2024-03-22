@@ -18,7 +18,6 @@ def get_db():
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
-    print("TOKEN: ", token)
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[HASH_ALGORITHM])
         user = payload.get("sub")

@@ -4,11 +4,12 @@ import schemas
 import models
 from dependencies import SessionLocal
 from models import engine
-from routers import auth, entries, prompts
+from routers import auth, entries, prompts, users
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.include_router(auth.router)
+app.include_router(users.router)
 app.include_router(entries.router)
 app.include_router(prompts.router)

@@ -14,11 +14,29 @@ openai_client = OpenAI(api_key=OPEN_AI_KEY)
 
 
 def get_user(db: Session, user_id: uuid.UUID):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    return {
+        "created_at": user.created_at,
+        "email": user.email,
+        "first_name": user.first_name,
+        "id": user.id,
+        "last_name": user.last_name,
+    }
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+    user = db.query(models.User).filter(models.User.email == email).first()
+    return (
+        {
+            "created_at": user.created_at,
+            "email": user.email,
+            "first_name": user.first_name,
+            "id": user.id,
+            "last_name": user.last_name,
+        }
+        if user
+        else None
+    )
 
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -38,21 +56,36 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 
-def create_user_entry(db: Session, entry: schemas.EntryCreate, user_id: uuid.UUID):
-    encrypted_entry = encrypt(entry.content)
-    db_entry = models.Entry(content=encrypted_entry, owner_id=user_id)
+def create_user_entry(db: Session, entry, user_id):
+    content = encrypt(entry.content)
+    db_entry = models.Entry(content=content, owner_id=user_id)
+
     db.add(db_entry)
     db.commit()
     db.refresh(db_entry)
 
-    decrypted_entry = {
+    return {
         "id": db_entry.id,
         "created_at": db_entry.created_at,
         "updated_at": db_entry.updated_at,
         "owner_id": db_entry.owner_id,
         "content": decrypt(db_entry.content),
     }
-    return decrypted_entry
+
+
+def delete_user(db: Session, user_id: uuid.UUID):
+    db_user = (
+        db.query(models.Entry)
+        .filter(
+            models.User.id == user_id,
+        )
+        .first()
+    )
+    if not db_user:
+        raise HTTPException(status_code=404, detail=f"Entry not found.")
+    db.delete(db_user)
+    db.commit()
+    return user_id
 
 
 def get_all_user_entries(db: Session, user_id):

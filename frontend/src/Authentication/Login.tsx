@@ -3,7 +3,7 @@ import {useNavigate } from 'react-router-dom';
 
 
 interface initialForm {
-    email?: string, password?: string
+    username?: string, password?: string
 }
 
 
@@ -19,11 +19,14 @@ interface initialForm {
  * 
  * RouteList -> LoginForm
  */
-function LoginForm({ login }: { login: (FormData: initialForm) => void} ) {
+function LoginForm({ login }: { 
+  login: (FormData: initialForm) => void, 
+  displayErrors: (errors: {message:string}[]) => void
+  } ) {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<initialForm>({
-    email: "", 
+    username: "", 
     password: ""});
 //   const [errors, setErrors] = useState<null | Array<string>>(null);
 
@@ -38,7 +41,7 @@ function LoginForm({ login }: { login: (FormData: initialForm) => void} ) {
     evt.preventDefault();
     try {
       await login(formData);
-      setFormData({ email: "", password: "" });
+      setFormData({ username: "", password: "" });
       navigate("/events");
     } catch (err) {
         if (err instanceof Array) {
@@ -48,29 +51,25 @@ function LoginForm({ login }: { login: (FormData: initialForm) => void} ) {
   }
 
   return (
-    <div className="mt-16 h-screen w-screen flex flex-col items-center justify-start">
-      <h2 className="text-3xl font-bold">Login</h2>
+    <div className="">
+      <h2 className="">Login</h2>
       <form onSubmit={handleSubmit}
-        className="grid auto-rows-auto grid-cols-2 gap-4 text-center">
-          {/* <div className="col-span-2 w-full">
-            {(errors && errors!.length) && <Alert alerts={errors!} type="warning" />}
-          </div> */}
-
-        <div className="form-control col-span-2">
-          <label className="label-text font-semibold mb-1" htmlFor="email" >Email</label>
+        className="">
+        <div className="">
+          <label className="" htmlFor="email" >Email</label>
           <input  
-            className="input input-bordered input-primary"
-            name="email"
-            value={formData.email}
+            className=""
+            name="username"
+            value={formData.username}
             onChange={handleChange}
             required
           />
         </div>
 
         <div className="form-control col-span-2">
-          <label className="label-text font-semibold mb-1" htmlFor="password" >Password</label>
+          <label className="" htmlFor="password" >Password</label>
           <input type="password"
-             className="input input-bordered input-primary"
+             className=""
             name="password"
             value={formData.password}
             onChange={handleChange}
@@ -79,7 +78,7 @@ function LoginForm({ login }: { login: (FormData: initialForm) => void} ) {
         </div>
         <button 
           type="submit"
-          className="btn btn-primary mt-3 col-span-2 font-bold w-fill w-96">Login</button>
+          className="">Login</button>
 
       </form>
       </div>);

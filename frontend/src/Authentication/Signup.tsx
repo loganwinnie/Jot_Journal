@@ -13,16 +13,18 @@ interface initialForm {
  *  Component, Form for signing up an user.
  *
  * Props:
- * signup: Function for signup a user.
+ *  signup: Function for signup a user.
+ *  displayErrors: Function for setting errors
  * 
  * State: 
- *  errors: Array of error objects created when submitting form.
  *  formData: data input from form. Matches initial state fields
  * 
  * RouteList -> LoginForm
  */
 function SignupForm({ signup, displayErrors }:  { 
-    signup: (FormData: initialForm) => void, displayErrors: (errors: {message:string}[]) => void}) {
+    signup: (FormData: initialForm) => void, 
+    displayErrors: (errors: {message:string}[]) => void
+    }) {
 
     const initialState = {
         password: "",
@@ -90,21 +92,9 @@ function SignupForm({ signup, displayErrors }:  {
             <input type="email"
                 className=""
                 name="email"
-                value={formData.email}
+                value={formData.username}
                 onChange={handleChange}
                 required
-            />
-            </div>
-
-            <div className="">
-            <label 
-                className=""
-                htmlFor="phoneNumber">Phone #</label>
-            <input className=""
-                placeholder="(optional)"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
             />
             </div>
 

@@ -1,6 +1,6 @@
 from typing import Annotated
 import uuid
-from fastapi import Depends, FastAPI, HTTPException, Path, Query, status, APIRouter
+from fastapi import Depends, HTTPException, Path, APIRouter
 from sqlalchemy.orm import Session
 from dependencies import get_db, get_current_user
 import schemas, crud
