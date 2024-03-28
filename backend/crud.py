@@ -58,7 +58,12 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 def create_user_entry(db: Session, entry, user_id):
     content = encrypt(entry.content)
-    db_entry = models.Entry(content=content, owner_id=user_id)
+    db_entry = models.Entry(
+        content=content,
+        emoji=entry.emoji,
+        emoji_name=entry.emoji_name,
+        owner_id=user_id,
+    )
 
     db.add(db_entry)
     db.commit()
@@ -69,6 +74,8 @@ def create_user_entry(db: Session, entry, user_id):
         "created_at": db_entry.created_at,
         "updated_at": db_entry.updated_at,
         "owner_id": db_entry.owner_id,
+        "emoji": db_entry.emoji,
+        "emoji_name": db_entry.emoji_name,
         "content": decrypt(db_entry.content),
     }
 
@@ -151,6 +158,8 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
         "id": db_entry.id,
         "created_at": db_entry.created_at,
         "updated_at": db_entry.updated_at,
+        "emoji": db_entry.emoji,
+        "emoji_name": db_entry.emoji_name,
         "owner_id": db_entry.owner_id,
         "content": decrypt(db_entry.content),
     }

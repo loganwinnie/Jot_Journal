@@ -1,12 +1,10 @@
 from datetime import timedelta, datetime, timezone
-from typing import Annotated
 import bcrypt
-from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException
 import jwt
 from config import ACCESS_TOKEN_TIME, HASH_ALGORITHM, JWT_SECRET_KEY, ENCRYPT_KEY
-import crud
 from cryptography.fernet import Fernet
+import models
 
 
 def hash_password(password, salt):
@@ -17,9 +15,10 @@ def hash_password(password, salt):
 
 
 def authenticate_user(email, password, db):
-    db_user = crud.get_user_by_email(db=db, email=email)
+    db_user = db.query(models.User).filter(models.User.email == email).first()
     if not db_user:
         raise HTTPException(status_code=400, detail="Account does not exist.")
+    print(db_user)
     hashed_password = hash_password(password=password, salt=db_user.salt)
     if str(hashed_password, "utf-8") != db_user.password:
         raise HTTPException(status_code=400, detail="Invalid email or password.")

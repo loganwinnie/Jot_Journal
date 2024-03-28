@@ -5,6 +5,8 @@ from datetime import datetime
 
 class EntryBase(BaseModel):
     content: str
+    emoji: str
+    emoji_name: str
 
 
 class EntryCreate(EntryBase):

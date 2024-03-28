@@ -71,6 +71,8 @@ class Entry(Base):
         nullable=True,
         default=func.now(),
     )
+    emoji_name: Mapped[str] = mapped_column(nullable=True)
+    emoji: Mapped[str] = mapped_column(nullable=True)
     updated_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True),
         onupdate=func.now(),

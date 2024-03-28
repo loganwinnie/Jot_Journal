@@ -4,9 +4,10 @@ import { logoutUser } from "../redux/user"
 
 const baseQuery = fetchBaseQuery({
     baseUrl: "http://localhost:8000",
-    credentials: "include",
+    credentials: "omit",
     prepareHeaders: (headers, {getState}: any) => {
-        const token: string = getState()!.auth.token.access_token
+        const token: string = getState().user.token?.access_token
+        console.log("TOKEN", token)
         if (token) {
             headers.set("authorization", `Bearer ${token}`)
         }
@@ -19,7 +20,7 @@ const logoutIfUnauth = async (
     api: BaseQueryApi, 
     extraOptions: object) => {
     const result = await baseQuery(args, api, extraOptions)
-
+    
     if (result?.error?.status === 401) {
         api.dispatch(logoutUser(undefined))
     } 

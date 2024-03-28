@@ -1,13 +1,13 @@
-import { createContext } from 'react';
+// import { createContext } from 'react';
 
-interface UserInterface {
-  email: string
-  first_name: string
-  last_name: string
-  password: string
-  created_at: string
-}
+// interface UserInterface {
+//   email: string
+//   first_name: string
+//   last_name: string
+//   password: string
+//   created_at: string
+// }
 
-const userContext = createContext<null | UserInterface>(null);
+// const userContext = createContext<null | UserInterface>(null);
 
-export default userContext;
+// export default userContext;

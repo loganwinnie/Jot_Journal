@@ -1,10 +1,19 @@
 import React, {useState } from "react";
 import {useNavigate } from 'react-router-dom';
+import { useLoginMutation } from "../../api/auth";
+import { useDispatch } from "react-redux";
+import { setToken } from "../../redux/user";
 
 
 interface initialForm {
     username?: string, password?: string
 }
+
+interface TokenInterface {
+        access_token: string
+        token_type: string
+  } 
+
 
 
 /**
@@ -19,11 +28,11 @@ interface initialForm {
  * 
  * RouteList -> LoginForm
  */
-function LoginForm({ login }: { 
-  login: (FormData: initialForm) => void, 
-  displayErrors: (errors: {message:string}[]) => void
-  } ) {
+function LoginForm() {
   const navigate = useNavigate();
+  const [login, {isLoading}] = useLoginMutation()
+  const dispatch = useDispatch()
+
 
   const [formData, setFormData] = useState<initialForm>({
     username: "", 
@@ -40,8 +49,10 @@ function LoginForm({ login }: {
   async function handleSubmit(evt: React.FormEvent<HTMLFormElement>) {
     evt.preventDefault();
     try {
-      await login(formData);
+      const token: TokenInterface = await login(formData).unwrap();
       setFormData({ username: "", password: "" });
+      dispatch(setToken({token}))
+      navigate("/")
     } catch (err) {
         if (err instanceof Array) {
         //   setErrors(err);

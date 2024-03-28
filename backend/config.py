@@ -28,6 +28,7 @@ OPEN_AI_KEY = environ.get("OPEN_AI_KEY")
 OPEN_AI_MODEL = environ.get("OPEN_AI_MODEL")
 OPEN_AI_REQUEST_PER_HOUR = environ.get("OPEN_AI_REQUEST_PER_HOUR", 20)
 ENCRYPT_KEY = environ.get("ENCRYPT_KEY", "blahblahblah")
+ALLOWED_ORIGIN = environ.get("ALLOWED_ORIGIN", "*")
 
 ### Printing Env variables on server start
 print("")
@@ -37,6 +38,9 @@ print(f"{bcolors.BLUE} HASH_ALGORITHM : {bcolors.CYAN} {HASH_ALGORITHM} {bcolors
 print(f"{bcolors.BLUE} OPEN_AI_MODEL : {bcolors.CYAN} {OPEN_AI_MODEL} {bcolors.ENDC}")
 print(
     f"{bcolors.BLUE} ACCESS_TOKEN_TIME : {bcolors.CYAN} {ACCESS_TOKEN_TIME} {bcolors.ENDC}"
+)
+print(
+    f"{bcolors.BLUE} ALLOWED_ORIGIN : {bcolors.CYAN} {ALLOWED_ORIGIN} {bcolors.ENDC}"
 )
 print(
     f"{bcolors.BLUE} OPEN_AI_REQUEST_PER_HOUR : {bcolors.CYAN} {OPEN_AI_REQUEST_PER_HOUR} {bcolors.ENDC}"
