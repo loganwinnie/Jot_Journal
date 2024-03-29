@@ -28,8 +28,7 @@ import Home from '../Home';
  * App-> RouteList -> Rest of components
  */
 function RouteList( ) {
-  const user = useAppSelector((state) => state.user.user)
-  console.log("USER ROUTES: ", user)
+  const token = useAppSelector((state) => state.user.token)
   const routesLoggedOut = (
     <>
      <Route element={<HomeAnon/>} path="/"/>
@@ -46,7 +45,7 @@ function RouteList( ) {
 
   return (
     <Routes>
-      {user ? routesLoggedIn : routesLoggedOut};
+      {token ? routesLoggedIn : routesLoggedOut};
     </Routes>
   );
 }

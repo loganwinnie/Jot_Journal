@@ -7,4 +7,22 @@
     @apply rounded-full border-2 bg-secondary-300 px-6 py-2 font-Halcom
     text-white transition-all hover:bg-secondary-400 active:scale-95;
   }
+
+  .btn-primary {
+    @apply w-full max-w-52 rounded-md bg-primary-500 py-1 font-Raleway 
+    text-lg font-bold text-light-200 transition-all hover:scale-105
+    hover:bg-slate-400 hover:text-dark-500 active:scale-95 active:bg-primary-200;
+  }
+
+  .field {
+    @apply flex flex-col items-start justify-start;
+  }
+
+  .label {
+    @apply font-Raleway font-semibold text-dark-500;
+  }
+
+  .input {
+    @apply border-b-2 border-light-300 bg-transparent outline-none;
+  }
 }

@@ -21,10 +21,7 @@ interface initialForm {
  * 
  * RouteList -> LoginForm
  */
-function SignupForm({ signup, displayErrors }:  { 
-    signup: (FormData: initialForm) => void, 
-    displayErrors: (errors: {message:string}[]) => void
-    }) {
+function SignupForm() {
 
     const initialState = {
         password: "",
@@ -47,26 +44,29 @@ function SignupForm({ signup, displayErrors }:  {
     async function handleSubmit(evt: React.FormEvent<HTMLFormElement>) {
         evt.preventDefault();
         try {
-            await signup(formData);
+            // await signup(formData);
             setFormData(initialState);
             navigate("/create-profile");
         } catch (errs) {
             console.log(errs)
             if (errs instanceof Array) {
-                displayErrors(errs)
+                // displayErrors(errs)
             }
         }
     }
 
   return (  
+    <div className="flex flex-col gap-4">
+        <h2 className="text-2xl font-Raleway font-semibold text-dark-500 mb-4">Signup</h2>
+
         <form onSubmit={handleSubmit} 
-            className="">
-            <div className="">
+            className="border-b-2 flex flex-col items-center justify-between gap-4 w-full">
+            <div className="field">
             <label 
-                className=""
+                className="label"
                 htmlFor="firstName">First Name</label>
             <input type="firstName"
-                className=""
+                className="input"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
@@ -74,10 +74,10 @@ function SignupForm({ signup, displayErrors }:  {
             />
             </div>
 
-            <div className="">
-            <label className="" htmlFor="lastName">Last Name</label>
+            <div className="field">
+            <label className="label" htmlFor="lastName">Last Name</label>
             <input type="lastName"
-                className=" "
+                className="input"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
@@ -85,12 +85,12 @@ function SignupForm({ signup, displayErrors }:  {
             />
             </div>
 
-            <div className="">
+            <div className="field">
             <label 
-                className=""
+                className="label"
                 htmlFor="email">Email</label>
             <input type="email"
-                className=""
+                className="input"
                 name="email"
                 value={formData.username}
                 onChange={handleChange}
@@ -98,12 +98,12 @@ function SignupForm({ signup, displayErrors }:  {
             />
             </div>
 
-            <div className=" ">
+            <div className="field">
             <label 
-                className=" "
+                className="label"
                 htmlFor="password">Password</label>
             <input type="password"
-                className="" 
+                className="input" 
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -113,8 +113,9 @@ function SignupForm({ signup, displayErrors }:  {
 
             <button 
                 type="submit" 
-                className="">Sign up</button>
+                className="btn-primary m-8">Sign up</button>
         </form>
+        </div>
   );
 }
 

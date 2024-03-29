@@ -4,7 +4,6 @@ import { useLoginMutation } from "../../api/auth";
 import { useDispatch } from "react-redux";
 import { setToken } from "../../redux/user";
 
-
 interface initialForm {
     username?: string, password?: string
 }
@@ -52,7 +51,6 @@ function LoginForm() {
       const token: TokenInterface = await login(formData).unwrap();
       setFormData({ username: "", password: "" });
       dispatch(setToken({token}))
-      navigate("/")
     } catch (err) {
         if (err instanceof Array) {
         //   setErrors(err);
@@ -61,37 +59,37 @@ function LoginForm() {
   }
 
   return (
-    <div className="">
-      <h2 className="">Login</h2>
-      <form onSubmit={handleSubmit}
-        className="">
-        <div className="">
-          <label className="" htmlFor="email" >Email</label>
-          <input  
-            className=""
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <div className="flex flex-col gap-4">
+      <h2 className="text-2xl font-Raleway font-semibold text-dark-500">Login</h2>
+        <form onSubmit={handleSubmit}
+          className="border-b-2 flex flex-col items-center justify-between gap-4 w-full">
+          <div className="field">
+            <label className="label" htmlFor="email" >Email</label>
+            <input  
+              className="input"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <div className="form-control col-span-2">
-          <label className="" htmlFor="password" >Password</label>
-          <input type="password"
-             className=""
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button 
-          type="submit"
-          className="">Login</button>
-
-      </form>
-      </div>);
+          <div className="field">
+            <label className="label" htmlFor="password" >Password</label>
+            <input type="password"
+              className="input"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button 
+            type="submit"
+            className="btn-primary m-8">Login</button>
+        </form>
+      </div>
+);
 }
 
 export default LoginForm;

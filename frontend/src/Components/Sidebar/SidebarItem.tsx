@@ -13,7 +13,7 @@ interface item {
  * 
  * App -> Navbar -> {Link,...}
  */
-function Sidebar({entry}: {entry: item}) {
+function SidebarItem({entry}: {entry: item}) {
 
 return (
     <div className="col-span-1 bg-secondary-300">
@@ -24,4 +24,4 @@ return (
 
 
 
-export default Sidebar
+export default SidebarItem
