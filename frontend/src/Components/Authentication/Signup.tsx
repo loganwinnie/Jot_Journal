@@ -1,14 +1,28 @@
 import React, {  useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { useSignupMutation } from "../../api/auth";
+import { setToken } from "../../redux/user";
+import { useDispatch } from "react-redux";
 
 
 interface initialForm {
         password: string,
-        firstName: string,
-        lastName: string,
-        username: string
+        first_name: string,
+        last_name: string,
+        email: string
     }
 
+const initialState = {
+    password: "",
+    first_name: "",
+    last_name: "",
+    email: ""
+};
+
+interface TokenInterface {
+    access_token: string
+    token_type: string
+} 
 /**
  *  Component, Form for signing up an user.
  *
@@ -22,16 +36,10 @@ interface initialForm {
  * RouteList -> LoginForm
  */
 function SignupForm() {
-
-    const initialState = {
-        password: "",
-        firstName: "",
-        lastName: "",
-        username: ""
-    };
-
     const navigate = useNavigate();
     const [formData, setFormData] = useState<initialForm>(initialState);
+    const [signup, {isLoading}] = useSignupMutation()
+    const dispatch = useDispatch()
 
 
     /** handleChange: Handles change of form field.*/
@@ -44,9 +52,11 @@ function SignupForm() {
     async function handleSubmit(evt: React.FormEvent<HTMLFormElement>) {
         evt.preventDefault();
         try {
-            // await signup(formData);
+            console.log(formData)
+            const token: TokenInterface = await signup(formData).unwrap();
             setFormData(initialState);
-            navigate("/create-profile");
+            navigate("/");
+            dispatch(setToken({token}))
         } catch (errs) {
             console.log(errs)
             if (errs instanceof Array) {
@@ -64,35 +74,11 @@ function SignupForm() {
             <div className="field">
             <label 
                 className="label"
-                htmlFor="firstName">First Name</label>
-            <input type="firstName"
-                className="input"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-            />
-            </div>
-
-            <div className="field">
-            <label className="label" htmlFor="lastName">Last Name</label>
-            <input type="lastName"
-                className="input"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-            />
-            </div>
-
-            <div className="field">
-            <label 
-                className="label"
                 htmlFor="email">Email</label>
             <input type="email"
                 className="input"
                 name="email"
-                value={formData.username}
+                value={formData.email}
                 onChange={handleChange}
                 required
             />
@@ -110,6 +96,30 @@ function SignupForm() {
                 required
             />
             </div>
+            <div className="field">
+            <label 
+                className="label"
+                htmlFor="first_name">First Name</label>
+            <input type="first_name"
+                className="input"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+                required
+            />
+            </div>
+
+            <div className="field">
+            <label className="label" htmlFor="last_name">Last Name</label>
+            <input type="last_name"
+                className="input"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+                required
+            />
+            </div>
+
 
             <button 
                 type="submit" 

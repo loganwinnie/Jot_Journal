@@ -63,7 +63,7 @@ class Entry(Base):
         primary_key=True,
         default=text("gen_random_uuid()"),
     )
-    content: Mapped[types.LargeBinary] = mapped_column(types.LargeBinary)
+    content: Mapped[types.LargeBinary] = mapped_column(types.LargeBinary, nullable=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     owner: Mapped["User"] = relationship(back_populates="entries")
     created_at: Mapped[DateTime] = mapped_column(
@@ -71,6 +71,7 @@ class Entry(Base):
         nullable=True,
         default=func.now(),
     )
+    title: Mapped[str] = mapped_column(String(), nullable=True)
     emoji_name: Mapped[str] = mapped_column(nullable=True)
     emoji: Mapped[str] = mapped_column(nullable=True)
     updated_at: Mapped[DateTime] = mapped_column(

@@ -4,9 +4,10 @@ from datetime import datetime
 
 
 class EntryBase(BaseModel):
-    content: str
-    emoji: str
-    emoji_name: str
+    title: str | None
+    content: str | None
+    emoji: str | None
+    emoji_name: str | None
 
 
 class EntryCreate(EntryBase):

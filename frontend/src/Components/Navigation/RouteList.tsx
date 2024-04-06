@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { useAppSelector } from "../../redux/hooks"
 import HomeAnon from '../HomeAnon';
 import Home from '../Home';

@@ -1,18 +1,15 @@
-import { useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { getSidebarOpen } from "../../redux/toggle";
-import { useGetAllEntriesQuery } from "../../api/entry";
-import data from '@emoji-mart/data'
-import { init } from 'emoji-mart'
 import SidebarItem from "./SidebarItem";
-init({ data })
 
 interface EntryInterface {
   id: string
   created_at: string
   updated_at: string | null
-  content: string
-  emoji_code: string
-  emoji_name:string
+  content: string | null
+  emoji: string | null
+  emoji_name: string | null
+  title: string | null
 }
 
 /**
@@ -23,17 +20,18 @@ interface EntryInterface {
  * 
  * App -> Navbar -> {Link,...}
  */
-function Sidebar() {
-    const sidebarState = useSelector(getSidebarOpen)
-    const {data: entries, isLoading} = useGetAllEntriesQuery({});
-
-  if (isLoading) return <div><h1>Is loading</h1></div>
-  console.log("ENTRIES", entries)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function Sidebar({entries} : {entries: EntryInterface[]})   {
+  const sidebarState = useSelector(getSidebarOpen)
   return (
     <div className={`bg-light-100 border-r-4 ${sidebarState ?"col-span-4" : "col-span-1"}`}>
-      {entries.entries.map((entry:EntryInterface, index:number) => {
-        <SidebarItem entry={entry} key={index}/>
-      })}
+      {entries && entries.map((entry:EntryInterface, index) => (
+        <SidebarItem 
+          entry={entry} 
+          sidebarOpen={sidebarState} 
+          key={entry.id}
+          last={index === entries.length-1}/>
+      )) }
     </div>
     )
   }

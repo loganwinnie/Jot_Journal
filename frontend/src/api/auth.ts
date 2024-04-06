@@ -1,22 +1,24 @@
-import { apiSlice } from './apiSlice';
+import { apiSlice } from "./apiSlice";
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     signup: builder.mutation({
-      query: (userInfo) => ({
-        url: '/auth/signup',
-        method: 'POST',
-        body: { ...userInfo },
-      }),
+      query: (userInfo) => {
+        return {
+          url: "/auth/register",
+          method: "POST",
+          body: userInfo,
+        };
+      },
     }),
     login: builder.mutation({
       query: (userInfo) => {
         const formData = new FormData();
-        formData.append('username', userInfo.username!);
-        formData.append('password', userInfo.password!);
+        formData.append("username", userInfo.username!);
+        formData.append("password", userInfo.password!);
         return {
-          url: '/auth/token',
-          method: 'POST',
+          url: "/auth/token",
+          method: "POST",
           body: formData,
         };
       },
@@ -24,7 +26,7 @@ export const authApi = apiSlice.injectEndpoints({
     getCurrentUser: builder.query({
       query: () => ({
         url: `/users/`,
-        method: 'GET',
+        method: "GET",
       }),
     }),
   }),

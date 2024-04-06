@@ -4,8 +4,8 @@
 
 @layer components {
   .btn-secondary {
-    @apply rounded-full border-2 bg-secondary-300 px-6 py-2 font-Halcom
-    text-white transition-all hover:bg-secondary-400 active:scale-95;
+    @apply rounded-lg border-2 border-primary-100 bg-primary-100 px-4 py-1 font-Halcom
+    font-semibold text-primary-300 transition-all hover:border-primary-200 hover:bg-primary-100 active:scale-95;
   }
 
   .btn-primary {

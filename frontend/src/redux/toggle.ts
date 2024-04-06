@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 interface ToggleInterface {
   authForm: boolean;
+  entryForm: boolean;
   entry: boolean;
   sidebar: boolean;
   loading: boolean;
@@ -18,6 +19,7 @@ interface ToggleInterface {
 
 const initialState: ToggleInterface = {
   authForm: true,
+  entryForm: false,
   entry: false,
   sidebar: false,
   loading: false,
@@ -28,8 +30,8 @@ const toggleSlice = createSlice({
   initialState,
   reducers: {
     /** Boolean: True for login form, false for signup */
-    toggleAuthForm: (state) => {
-      state.authForm = !state.authForm;
+    toggleEntryForm: (state) => {
+      state.entryForm = !state.entryForm;
     },
     toggleEntry: (state) => {
       state.entry = !state.entry;
@@ -43,15 +45,15 @@ const toggleSlice = createSlice({
   },
 });
 
-export const { toggleAuthForm, toggleEntry, toggleSidebar, toggleLoading } =
+export const { toggleEntry, toggleSidebar, toggleLoading, toggleEntryForm } =
   toggleSlice.actions;
 
 export default toggleSlice.reducer;
 
-export const getLoginOpen = (state: { toggle: { authForm: boolean } }) =>
-  state.toggle.authForm;
 export const getEntryOpen = (state: { toggle: { entry: boolean } }) =>
   state.toggle.entry;
+export const getEntryFormOpen = (state: { toggle: { entryForm: boolean } }) =>
+  state.toggle.entryForm;
 export const getSidebarOpen = (state: { toggle: { sidebar: boolean } }) =>
   state.toggle.sidebar;
 export const getLoading = (state: { toggle: { loading: boolean } }) =>

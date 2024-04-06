@@ -1,5 +1,4 @@
 import React, {useState } from "react";
-import {useNavigate } from 'react-router-dom';
 import { useLoginMutation } from "../../api/auth";
 import { useDispatch } from "react-redux";
 import { setToken } from "../../redux/user";
@@ -28,7 +27,6 @@ interface TokenInterface {
  * RouteList -> LoginForm
  */
 function LoginForm() {
-  const navigate = useNavigate();
   const [login, {isLoading}] = useLoginMutation()
   const dispatch = useDispatch()
 

@@ -57,7 +57,8 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 
 def create_user_entry(db: Session, entry, user_id):
-    content = encrypt(entry.content)
+
+    content = encrypt(entry.content) if entry.content else None
     db_entry = models.Entry(
         content=content,
         emoji=entry.emoji,
@@ -76,7 +77,8 @@ def create_user_entry(db: Session, entry, user_id):
         "owner_id": db_entry.owner_id,
         "emoji": db_entry.emoji,
         "emoji_name": db_entry.emoji_name,
-        "content": decrypt(db_entry.content),
+        "content": decrypt(entry.content) if entry.content else None,
+        "title": entry.title,
     }
 
 
@@ -104,7 +106,10 @@ def get_all_user_entries(db: Session, user_id):
             "created_at": entry.created_at,
             "updated_at": entry.updated_at,
             "owner_id": entry.owner_id,
-            "content": decrypt(entry.content),
+            "content": decrypt(entry.content) if entry.content else None,
+            "emoji": entry.emoji,
+            "emoji_name": entry.emoji_name,
+            "title": entry.title,
         }
         for entry in entries
     ]
@@ -131,7 +136,10 @@ def get_entry(db: Session, user_id, entry_id):
         "created_at": entry.created_at,
         "updated_at": entry.updated_at,
         "owner_id": entry.owner_id,
-        "content": decrypt(entry.content),
+        "content": decrypt(entry.content) if entry.content else None,
+        "emoji": entry.emoji,
+        "emoji_name": entry.emoji_name,
+        "title": entry.title,
     }
     return decrypted_entry
 
@@ -150,7 +158,7 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
         raise HTTPException(
             status_code=401, detail=f"Cannot modify other user entries."
         )
-    db_entry.content = encrypt(entry.content)
+    db_entry.content = encrypt(entry.content) if entry.content else None
     db_entry.updated_at = func.now()
     db.commit()
     db.refresh(db_entry)
@@ -161,7 +169,8 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
         "emoji": db_entry.emoji,
         "emoji_name": db_entry.emoji_name,
         "owner_id": db_entry.owner_id,
-        "content": decrypt(db_entry.content),
+        "content": decrypt(entry.content) if entry.content else None,
+        "title": db_entry.title,
     }
     return decrypted_entry
 
