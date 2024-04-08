@@ -44,6 +44,7 @@ export default {
       },
       gridColumn: {
         "span-15": "span 15 / span 15",
+        "span-13": "span 13 / span 13",
       },
       keyframes: {
         SMOOTH: {

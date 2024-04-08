@@ -50,7 +50,7 @@ function NavBar() {
 
     return (
     <>
-      <div className={`flex justify-between border-b-2 px-8 py-8 h-16 items-center absolute z-50 bg-light-100 w-full`}>
+      <div className={`flex justify-between border-b-2 px-8 py-8 h-16 items-center z-50 bg-light-100 w-full fixed`}>
         <div className="flex items-center gap-4">
         { user &&
         <div onClick={() => dispatch(toggleSidebar())} className="p-2 transition-all">

@@ -1,4 +1,4 @@
-import  {  useEffect, useState } from "react";
+import  {  useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSidebarOpen } from "../../redux/toggle";
 import { getEntry, setActive, setEntry } from "../../redux/entry";
@@ -49,8 +49,8 @@ function Entry({entry}: {entry: EntryInterface | null}) {
     const dispatch = useDispatch()
     const [togglePicker, setTogglePicker] = useState(false)
     
-    console.log(entry)
     const initialForm = {
+        id: entry!.id,
         title: entry?.title ||"",
         content: entry?.content||"",
         emoji: entry?.emoji||"",
@@ -63,19 +63,23 @@ function Entry({entry}: {entry: EntryInterface | null}) {
     },[formData])
 
     
+    
+    const debounceFn = useMemo(() => debounce(() => handleChange, 2000), [entry])
+    
+    async function updateEntry() {
+        console.log("EDITING", entry)
+        const updatedEntry: EntryInterface = await editEntry({content:formData, entryId: formData!.id}).unwrap();
+        console.log("UPDATE", updatedEntry)
+        dispatch(setActive({entry: updatedEntry}))
+    }
+    
+    
     /** handleChange: Handles change of form field.*/
     async function handleChange(evt : React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) {
         const { name , value } = evt.target as HTMLInputElement
         setFormData(oldData => ({...oldData ,[name]:value}))
-        debounce(updateEntry, 2000)
+        debounceFn()
     }
-    
-    async function updateEntry() {
-        const entry: EntryInterface = await editEntry(formData).unwrap();
-        console.log("UPDATE", entry)
-        dispatch(setActive({entry}))
-    }
-
 
     function handleEmoji(selected: EmojiInterface) {
         setFormData(prev => ({
@@ -86,7 +90,7 @@ function Entry({entry}: {entry: EntryInterface | null}) {
     }
 
     return (
-        <div className={`bg-light-100 h-full ${sidebarState ? "col-span-12" : "col-span-15"} p-16`}>
+        <div className={`bg-light-100 h-full ${sidebarState ? "col-span-13" : "col-span-15"} p-16`}>
             <form action="PATCH" className="flex flex-col grow min-h-full h-full">
                     <div className="absolute">
                         <label className="label" htmlFor="emoji" ></label>
@@ -104,7 +108,7 @@ function Entry({entry}: {entry: EntryInterface | null}) {
                         required
                         />
                     </div>
-                    <textarea className="textarea mt-20 min-h-full empty:before:content-['Today_I_am_feeling...']
+                    <textarea className="textarea mt-20 min-h-full empty:before:content-['Today_I_am_feeling...'] resize-none
                     empty:before:text-neutral-400 text-left outline-none" role="textbox" name="content"
                      onChange={handleChange} placeholder="Today I am feeling..."></textarea>
             </form>

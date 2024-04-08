@@ -52,7 +52,7 @@ function App() {
   }, [token, dispatch, user]);
 
   return (
-  <div className='h-full w-full'>
+  <div className='h-full w-full no-scrollbar'>
     <BrowserRouter>
     <div>
       <NavBar />

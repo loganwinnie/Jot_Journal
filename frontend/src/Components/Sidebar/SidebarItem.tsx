@@ -35,9 +35,17 @@ function SidebarItem({entry, sidebarOpen, last}: {
   function ifOpen() {
     return (
       entry && 
-        <div className="flex" id={entry.id}>
-          <h4 aria-details={entry.emoji_name || entry.id}>{entry.emoji}</h4>
-          <h1>{entry.title || "No Title"}</h1>
+        <div className={`flex items-center justify-start p-4 gap-4 border-t-2 border-light-200
+         hover:bg-light-200 ${last && "border-b-2"} ${entries?.active?.id === entry.id && "bg-light-200"}
+         `}
+          id={entry.id}
+          onClick={() => updateActive()}>
+           { entry.emoji && entry.emoji_name ?
+            <h4 aria-details={entry.emoji_name}>{entry.emoji}</h4>
+            :
+            <div className="rounded-full bg-light-300 opacity-70 w-12 h-12"></div>
+          }
+          <h1 className="text-xl font-bold font-Raleway">{entry.title || "No Title"}</h1>
         </div>
         )
   }

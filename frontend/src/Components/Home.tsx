@@ -35,8 +35,6 @@ function Home() {
 
   const {data: fetchedEntries, isLoading: entriesLoading} = useGetAllEntriesQuery({});
   const entries = useSelector(getEntries)
-  const [localEntries, setLocalEntries] = useState([])
-  const [localActive, setLocalActive] = useState<EntryInterface | null>(null)
 
   /** UseEffect for setting token and user.. */
   useEffect(function () {
@@ -46,7 +44,9 @@ function Home() {
         try {
           if (user) {
             dispatch(setUser(user)); 
-            dispatch(setEntries({entries: fetchedEntries}))
+            if (!entriesLoading) {
+              dispatch(setEntries({entries: fetchedEntries.entries}))
+            }
           } 
         } catch (err) {
           console.error(err);
@@ -64,29 +64,15 @@ function Home() {
 
   useEffect(function () {
     function updateEntries() {
-      setLocalEntries(fetchedEntries?.entries)
-      setLocalActive(entries?.active)
-      dispatch(setEntries({entries: fetchedEntries}))
-
-    }
-    
+      dispatch(setEntries({entries: fetchedEntries?.entries}))
+    }  
     updateEntries()
-  }, [fetchedEntries])
+  }, [entriesLoading])
 
-   useEffect(function () {
-    function getActive() {
-      setLocalActive(entries?.active)
-      console.log("ACTIVE", localActive)
-    }
-    getActive()
-  }, [entries])
-  
-  console.log("ACTIVE", localActive)
-  return (
-    <div className="grid grid-cols-16 h-full pt-16">
-      {!entriesLoading && <Sidebar entries={localEntries}/>}
-      {localActive ? <Entry entry={localActive} /> : "SELECT AN ENTRY"}     
-      <h1>{localActive?.id || "HELLO"}</h1> 
+    return (
+    <div className="grid grid-cols-16 h-full pt-16 overflow-hidden">
+      {!entriesLoading && <Sidebar entries={entries?.entries}/>}
+      {entries?.active ? <Entry entry={entries?.active} /> : "SELECT AN ENTRY"}     
     </div>
   )
 

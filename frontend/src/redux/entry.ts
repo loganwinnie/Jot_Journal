@@ -30,10 +30,10 @@ const entrySlice = createSlice({
       }>,
     ) => {
       const { entry } = action.payload;
-      state = {
+      return (state = {
         ...state,
         active: entry,
-      };
+      });
     },
 
     clearEntry: (state) => {
@@ -60,8 +60,10 @@ const entrySlice = createSlice({
       }>,
     ) => {
       const { entry } = action.payload;
-      state.active = entry;
-      state.entries = [...state.entries, entry];
+      return (state = {
+        active: entry,
+        entries: [...state.entries, entry],
+      });
     },
   },
 });
