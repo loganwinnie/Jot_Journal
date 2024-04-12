@@ -60,6 +60,7 @@ def create_user_entry(db: Session, entry, user_id):
 
     content = encrypt(entry.content) if entry.content else None
     db_entry = models.Entry(
+        title=entry.title,
         content=content,
         emoji=entry.emoji,
         emoji_name=entry.emoji_name,
@@ -159,7 +160,11 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
             status_code=401, detail=f"Cannot modify other user entries."
         )
     db_entry.content = encrypt(entry.content) if entry.content else None
+    db_entry.title = entry.title if entry.title else None
+    db_entry.emoji = entry.emoji if entry.emoji else None
+    db_entry.emoji_name = entry.emoji_name if entry.emoji_name else None
     db_entry.updated_at = func.now()
+    print("CONTENT,", encrypt(entry.content) if entry.content else None)
     db.commit()
     db.refresh(db_entry)
     decrypted_entry = {
@@ -169,9 +174,10 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
         "emoji": db_entry.emoji,
         "emoji_name": db_entry.emoji_name,
         "owner_id": db_entry.owner_id,
-        "content": decrypt(entry.content) if entry.content else None,
+        "content": decrypt(db_entry.content) if entry.content else None,
         "title": db_entry.title,
     }
+    print("entry:", decrypted_entry)
     return decrypted_entry
 
 

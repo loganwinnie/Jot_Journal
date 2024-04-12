@@ -53,6 +53,22 @@ const entrySlice = createSlice({
       });
     },
 
+    editEntry: (
+      state,
+      action: PayloadAction<{
+        entry: EntryInterface;
+      }>,
+    ) => {
+      const { entry } = action.payload;
+      const idx = state.entries.findIndex((elm) => elm.id === entry.id);
+      const entriesCopy = [...state.entries];
+      entriesCopy[idx] = entry;
+      return (state = {
+        active: entry,
+        entries: entriesCopy,
+      });
+    },
+
     addEntry: (
       state,
       action: PayloadAction<{
@@ -65,15 +81,46 @@ const entrySlice = createSlice({
         entries: [...state.entries, entry],
       });
     },
+    deleteAndClearEntry: (
+      state,
+      action: PayloadAction<{
+        entry: EntryInterface | null;
+      }>,
+    ) => {
+      const { entry } = action.payload;
+      const idx = state.entries.findIndex((elm) => elm.id === entry!.id);
+      return (state = {
+        active: null,
+        entries: [
+          ...state.entries.slice(0, idx),
+          ...state.entries.slice(idx + 1),
+        ],
+      });
+    },
   },
 });
 
-export const { setActive, clearEntry, setEntries, addEntry } =
-  entrySlice.actions;
+export const {
+  setActive,
+  clearEntry,
+  setEntries,
+  addEntry,
+  editEntry,
+  deleteAndClearEntry,
+} = entrySlice.actions;
 
 export default entrySlice.reducer;
 
 export const getEntries = (state: {
+  entry: {
+    active: EntryInterface | null;
+    entries: EntryInterface[];
+  };
+}) => {
+  return state.entry;
+};
+
+export const getEntry = (state: {
   entry: {
     active: EntryInterface | null;
     entries: EntryInterface[];

@@ -11,7 +11,7 @@ export const entryApi = apiSlice.injectEndpoints({
     }),
     deleteEntry: builder.mutation({
       query: (entryId) => ({
-        url: `/entries/delete/${entryId}`,
+        url: `/entries/${entryId}`,
         method: "DELETE",
       }),
     }),

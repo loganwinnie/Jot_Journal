@@ -1,22 +1,21 @@
-import  {  useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSidebarOpen } from "../../redux/toggle";
-import { getEntry, setActive, setEntry } from "../../redux/entry";
-import  Picker  from "@emoji-mart/react";
-import data from '@emoji-mart/data'
-import { init } from 'emoji-mart'
-import debounce from "lodash/debounce";
-import throttle from "lodash/throttle";
-import { useEditEntryMutation } from "../../api/entry";
-init({ data })
+import { deleteAndClearEntry, editEntry, } from "../../redux/entry";
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
+import { init } from "emoji-mart";
+import { useDebouncedCallback } from "use-debounce";
+import { useDeleteEntryMutation, useEditEntryMutation } from "../../api/entry";
+init({ data });
 
 interface EmojiInterface {
-    id: string
-    keywords: string[]
-    name: string
-    native: string
-    shortcodes: string
-    unified: string
+  id: string;
+  keywords: string[];
+  name: string;
+  native: string;
+  shortcodes: string;
+  unified: string;
 }
 
 interface EntryInterface {
@@ -29,6 +28,20 @@ interface EntryInterface {
   title: string | null;
 }
 
+interface formInterface {
+  id: string;
+  title: string;
+  content: string;
+  emoji: string;
+  emoji_name: string;
+}
+// const initialForm = {
+//     id: entry?.id || "",
+//     title: entry?.title || "",
+//     content: entry?.content || "",
+//     emoji:entry?.emoji || "",
+//     emoji_name: entry?.emoji_name ||""
+// }
 
 /*
  *  Component, Form for signing up an user.
@@ -36,85 +49,127 @@ interface EntryInterface {
  * Props:
  *  signup: Function for signup a user.
  *  displayErrors: Function for setting errors
- * 
- * State: 
+ *
+ * State:
  *  formData: data input from form. Matches initial state fields
- * 
+ *
  * RouteList -> LoginForm
  */
 
-function Entry({entry}: {entry: EntryInterface | null}) {
-    const [editEntry, {isLoading}] = useEditEntryMutation()
-    const sidebarState = useSelector(getSidebarOpen)
-    const dispatch = useDispatch()
-    const [togglePicker, setTogglePicker] = useState(false)
-    
-    const initialForm = {
-        id: entry!.id,
-        title: entry?.title ||"",
-        content: entry?.content||"",
-        emoji: entry?.emoji||"",
-        emoji_name: entry?.emoji_name||""
-    }
-    const [formData, setFormData] = useState(initialForm)
+function Entry({ entry }: { entry: EntryInterface | null }) {
+  const [editEntryApi] = useEditEntryMutation();
+  const [deleteEntry] = useDeleteEntryMutation();
+  const sidebarState = useSelector(getSidebarOpen);
+  const dispatch = useDispatch();
+  const [togglePicker, setTogglePicker] = useState(false);
+  const debouncer = useDebouncedCallback(
+    (value: formInterface) => updateEntry(value),
+    1000,
+  );
 
-    useEffect(function () {
-        console.log(formData)
-    },[formData])
-
-    
-    
-    const debounceFn = useMemo(() => debounce(() => handleChange, 2000), [entry])
-    
-    async function updateEntry() {
-        console.log("EDITING", entry)
-        const updatedEntry: EntryInterface = await editEntry({content:formData, entryId: formData!.id}).unwrap();
-        console.log("UPDATE", updatedEntry)
-        dispatch(setActive({entry: updatedEntry}))
+  useEffect(() => {
+    function reloadEntry() {
+        console.log("refresh", entry)
+      setFormData({
+        id: entry?.id || "",
+        title: entry?.title || "",
+        content: entry?.content || "",
+        emoji: entry?.emoji || "",
+        emoji_name: entry?.emoji_name || "",
+      });
     }
-    
-    
-    /** handleChange: Handles change of form field.*/
-    async function handleChange(evt : React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        const { name , value } = evt.target as HTMLInputElement
-        setFormData(oldData => ({...oldData ,[name]:value}))
-        debounceFn()
-    }
+    reloadEntry();
+  }, [entry]);
 
-    function handleEmoji(selected: EmojiInterface) {
-        setFormData(prev => ({
-            ...prev, 
-            emoji:selected.native, 
-            emoji_name: selected.name}))
-        setTogglePicker(prev => !prev)
-    }
+  const [formData, setFormData] = useState({
+    id: entry?.id || "",
+    title: entry?.title || "",
+    content: entry?.content || "",
+    emoji: entry?.emoji || "",
+    emoji_name: entry?.emoji_name || "",
+  });
 
-    return (
-        <div className={`bg-light-100 h-full ${sidebarState ? "col-span-13" : "col-span-15"} p-16`}>
-            <form action="PATCH" className="flex flex-col grow min-h-full h-full">
-                    <div className="absolute">
-                        <label className="label" htmlFor="emoji" ></label>
-                            { togglePicker ? <Picker data={data} onEmojiSelect={handleEmoji} /> :
-                        <button className="p-2 border-3 rounded-md bg-primary-200"
-                        onClick={() => setTogglePicker(prev => !prev)}>{formData.emoji || "😀"}</button>
-                    }
-                        <label className="label" htmlFor="title" ></label>
-                        <input  
-                        className="ml-4 input text-3xl  max-w-64 font-Raleway font-semibold"
-                        name="title"
-                        placeholder="Title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        required
-                        />
-                    </div>
-                    <textarea className="textarea mt-20 min-h-full empty:before:content-['Today_I_am_feeling...'] resize-none
-                    empty:before:text-neutral-400 text-left outline-none" role="textbox" name="content"
-                     onChange={handleChange} placeholder="Today I am feeling..."></textarea>
-            </form>
+  async function updateEntry(data: formInterface) {
+    console.log("updating");
+    const updatedEntry: {entry: EntryInterface} = await editEntryApi({
+      content: data,
+      entryId: data!.id,
+    }).unwrap();
+    console.log(updatedEntry)
+    dispatch(editEntry({ entry: updatedEntry.entry }));
+  }
+
+  /** handleChange: Handles change of form field.*/
+  async function handleChange(
+    evt: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
+    const { name, value } = evt.target as HTMLInputElement;
+    console.log(name, value);
+    setFormData((oldData) => ({ ...oldData, [name]: value }));
+    debouncer({ ...formData, [name]: value });
+  }
+
+  function handleEmoji(selected: EmojiInterface) {
+    setFormData((prev) => ({
+      ...prev,
+      emoji: selected.native,
+      emoji_name: selected.name,
+    }));
+    console.log(selected.native, selected.name);
+    setTogglePicker((prev) => !prev);
+    debouncer({ ...formData, emoji: selected.native, emoji_name: selected.name });
+  }
+
+  async function deleteEntryOnClick() {
+    const deletedEntry = await deleteEntry(entry!.id).unwrap();
+    console.log("DELETED", deletedEntry);
+    dispatch(deleteAndClearEntry({ entry: entry }));
+  }
+
+  return (
+    <div
+      className={`h-full bg-light-100 ${sidebarState ? "col-span-13" : "col-span-15"} px-16 py-8`}
+    >
+      <div
+        className=" mb-8 flex h-8 w-24 items-center justify-center rounded-md bg-red-300 font-semibold text-primary-500 hover:bg-red-400 active:scale-95"
+        onClick={() => deleteEntryOnClick()}
+      >
+        Delete
+      </div>
+      <form action="PATCH" className="flex h-full min-h-full grow flex-col">
+        <div className="absolute">
+          <label className="label" htmlFor="emoji"></label>
+          {togglePicker ? (
+            <Picker data={data} onEmojiSelect={handleEmoji} />
+          ) : (
+            <button
+              className="text-xl bg-opacity-40 border-3 rounded-xl bg-light-300 p-2"
+              onClick={() => setTogglePicker((prev) => !prev)}
+            >
+              {formData.emoji || "😀"}
+            </button>
+          )}
+          <label className="label" htmlFor="title"></label>
+          <input
+            className="input ml-4 max-w-64  font-Raleway text-3xl font-semibold"
+            name="title"
+            placeholder="Title"
+            value={formData.title}
+            onChange={(evt) => handleChange(evt)}
+            required
+          />
         </div>
-        )
+        <textarea
+          className="textarea mt-20 min-h-full resize-none text-left
+                    outline-none empty:before:text-neutral-400 empty:before:content-['Today_I_am_feeling...']"
+          role="textbox"
+          name="content"
+          onChange={handleChange}
+          placeholder="Today I am feeling..."
+        ></textarea>
+      </form>
+    </div>
+  );
 }
-
 
 export default Entry;

@@ -43,10 +43,10 @@ def patch_entry(
     db: Session = Depends(get_db),
 ):
     try:
-        entry = crud.patch_user_entry(
+        patched_entry = crud.patch_user_entry(
             db=db, entry=entry, user_id=req.get("user_id"), entry_id=entry_id
         )
-        return {"entry": entry}
+        return {"entry": patched_entry}
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 

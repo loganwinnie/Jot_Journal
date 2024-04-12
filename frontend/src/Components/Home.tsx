@@ -3,22 +3,22 @@ import Sidebar from "./Sidebar/Sidebar";
 // import { getEntryFormOpen, getSidebarOpen } from "../redux/toggle";
 import { useAppSelector } from "../redux/hooks";
 import { useGetCurrentUserQuery } from "../api/auth";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { logoutUser, setUser } from "../redux/user";
 import { useGetAllEntriesQuery } from "../api/entry";
 import Entry from "./Entries/Entry";
 import { getEntries, setEntries } from "../redux/entry";
 
 
-interface EntryInterface {
-  id: string;
-  created_at: string;
-  updated_at: string | null;
-  content: string | null;
-  emoji: string | null;
-  emoji_name: string | null;
-  title: string | null;
-}
+// interface EntryInterface {
+//   id: string;
+//   created_at: string;
+//   updated_at: string | null;
+//   content: string | null;
+//   emoji: string | null;
+//   emoji_name: string | null;
+//   title: string | null;
+// }
 /**
  * Renders Home Screen if Logged out
  * State: 
@@ -31,7 +31,7 @@ function Home() {
   // const entryFormOpen = useAppSelector(getEntryFormOpen)
   const dispatch = useDispatch()
   const token  = useAppSelector((state) => state.user.token?.access_token)
-  const {data: user, userLoading} = useGetCurrentUserQuery({});
+  const {data: user} = useGetCurrentUserQuery({});
 
   const {data: fetchedEntries, isLoading: entriesLoading} = useGetAllEntriesQuery({});
   const entries = useSelector(getEntries)
@@ -60,14 +60,14 @@ function Home() {
       }
     userInfo(); 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, user]);
+  }, [token, user, entriesLoading]);
 
   useEffect(function () {
     function updateEntries() {
       dispatch(setEntries({entries: fetchedEntries?.entries}))
     }  
     updateEntries()
-  }, [entriesLoading])
+  }, [])
 
     return (
     <div className="grid grid-cols-16 h-full pt-16 overflow-hidden">

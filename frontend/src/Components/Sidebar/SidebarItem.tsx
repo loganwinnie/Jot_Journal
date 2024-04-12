@@ -41,7 +41,7 @@ function SidebarItem({entry, sidebarOpen, last}: {
           id={entry.id}
           onClick={() => updateActive()}>
            { entry.emoji && entry.emoji_name ?
-            <h4 aria-details={entry.emoji_name}>{entry.emoji}</h4>
+            <h4 className="text-3xl" aria-details={entry.emoji_name}>{entry.emoji}</h4>
             :
             <div className="rounded-full bg-light-300 opacity-70 w-12 h-12"></div>
           }
@@ -60,7 +60,7 @@ function SidebarItem({entry, sidebarOpen, last}: {
           onClick={() => updateActive()}
          >
           { entry.emoji && entry.emoji_name ?
-            <h4 aria-details={entry.emoji_name}>{entry.emoji}</h4>
+            <h4 className="text-3xl" aria-details={entry.emoji_name}>{entry.emoji}</h4>
             :
             <div className="rounded-full bg-light-300 opacity-70 w-12 h-12"></div>
           }

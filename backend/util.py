@@ -54,6 +54,7 @@ def encrypt(message):
 
 def decrypt(encoded_message):
     fernet = Fernet(key=ENCRYPT_KEY)
+    print("ENCODED", encoded_message)
     message = fernet.decrypt(encoded_message)
     decoded_message = message.decode()
     return decoded_message
