@@ -61,11 +61,13 @@ const entrySlice = createSlice({
     ) => {
       const { entry } = action.payload;
       const idx = state.entries.findIndex((elm) => elm.id === entry.id);
-      const entriesCopy = [...state.entries];
-      entriesCopy[idx] = entry;
       return (state = {
         active: entry,
-        entries: entriesCopy,
+        entries: [
+          entry,
+          ...state.entries.slice(0, idx),
+          ...state.entries.slice(idx + 1),
+        ],
       });
     },
 
@@ -78,7 +80,7 @@ const entrySlice = createSlice({
       const { entry } = action.payload;
       return (state = {
         active: entry,
-        entries: [...state.entries, entry],
+        entries: [entry, ...state.entries],
       });
     },
     deleteAndClearEntry: (
@@ -127,4 +129,12 @@ export const getEntry = (state: {
   };
 }) => {
   return state.entry;
+};
+export const getActive = (state: {
+  entry: {
+    active: EntryInterface | null;
+    entries: EntryInterface[];
+  };
+}) => {
+  return state?.entry?.active;
 };

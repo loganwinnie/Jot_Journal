@@ -35,13 +35,7 @@ interface formInterface {
   emoji: string;
   emoji_name: string;
 }
-// const initialForm = {
-//     id: entry?.id || "",
-//     title: entry?.title || "",
-//     content: entry?.content || "",
-//     emoji:entry?.emoji || "",
-//     emoji_name: entry?.emoji_name ||""
-// }
+
 
 /*
  *  Component, Form for signing up an user.
@@ -55,42 +49,47 @@ interface formInterface {
  *
  * RouteList -> LoginForm
  */
-
 function Entry({ entry }: { entry: EntryInterface | null }) {
-  const [editEntryApi] = useEditEntryMutation();
+  const [editEntryApi, {isLoading: updateLoading}] = useEditEntryMutation();
   const [deleteEntry] = useDeleteEntryMutation();
   const sidebarState = useSelector(getSidebarOpen);
   const dispatch = useDispatch();
   const [togglePicker, setTogglePicker] = useState(false);
+  const [entrySaved, setEntrySaved] = useState(true)
   const debouncer = useDebouncedCallback(
     (value: formInterface) => updateEntry(value),
     1000,
   );
 
-  useEffect(() => {
-    function reloadEntry() {
-        console.log("refresh", entry)
-      setFormData({
-        id: entry?.id || "",
-        title: entry?.title || "",
-        content: entry?.content || "",
-        emoji: entry?.emoji || "",
-        emoji_name: entry?.emoji_name || "",
-      });
-    }
-    reloadEntry();
-  }, [entry]);
-
-  const [formData, setFormData] = useState({
+  const initialForm = {
     id: entry?.id || "",
     title: entry?.title || "",
     content: entry?.content || "",
-    emoji: entry?.emoji || "",
-    emoji_name: entry?.emoji_name || "",
-  });
+    emoji:entry?.emoji || "",
+    emoji_name: entry?.emoji_name ||""
+}
+  
+  useEffect(() => {
+    function reloadEntry() {
+      setFormData(initialForm);
+      console.log(entry?.id)
+    }
+    reloadEntry();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entry, dispatch]);
+
+  useEffect(() => {
+    function toggleSaved() {
+      if (!updateLoading) {
+        setEntrySaved(true)
+      }
+    }
+    toggleSaved()
+  }, [updateLoading])
+
+  const [formData, setFormData] = useState(initialForm);
 
   async function updateEntry(data: formInterface) {
-    console.log("updating");
     const updatedEntry: {entry: EntryInterface} = await editEntryApi({
       content: data,
       entryId: data!.id,
@@ -103,8 +102,8 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
   async function handleChange(
     evt: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) {
+    setEntrySaved(false)
     const { name, value } = evt.target as HTMLInputElement;
-    console.log(name, value);
     setFormData((oldData) => ({ ...oldData, [name]: value }));
     debouncer({ ...formData, [name]: value });
   }
@@ -115,26 +114,27 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
       emoji: selected.native,
       emoji_name: selected.name,
     }));
-    console.log(selected.native, selected.name);
     setTogglePicker((prev) => !prev);
     debouncer({ ...formData, emoji: selected.native, emoji_name: selected.name });
   }
 
   async function deleteEntryOnClick() {
-    const deletedEntry = await deleteEntry(entry!.id).unwrap();
-    console.log("DELETED", deletedEntry);
+    await deleteEntry(entry!.id).unwrap();
     dispatch(deleteAndClearEntry({ entry: entry }));
   }
 
   return (
     <div
-      className={`h-full bg-light-100 ${sidebarState ? "col-span-13" : "col-span-15"} px-16 py-8`}
+      className={`h-full bg-light-100 ${sidebarState ? "col-span-13" : "col-span-15"} px-16 py-4`}
     >
-      <div
-        className=" mb-8 flex h-8 w-24 items-center justify-center rounded-md bg-red-300 font-semibold text-primary-500 hover:bg-red-400 active:scale-95"
-        onClick={() => deleteEntryOnClick()}
-      >
-        Delete
+      <div className="flex justify-between">
+        <p className="flex mb-4">{entrySaved ? "All changes saved." : "Saving..."}</p>
+        <div
+          className=" mb-8 flex h-8 w-24 items-center justify-center rounded-md bg-red-300 font-semibold text-primary-500 hover:bg-red-400 active:scale-95"
+          onClick={() => deleteEntryOnClick()}
+          >
+          Delete
+        </div>
       </div>
       <form action="PATCH" className="flex h-full min-h-full grow flex-col">
         <div className="absolute">
@@ -164,6 +164,7 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
                     outline-none empty:before:text-neutral-400 empty:before:content-['Today_I_am_feeling...']"
           role="textbox"
           name="content"
+          value={formData.content}
           onChange={handleChange}
           placeholder="Today I am feeling..."
         ></textarea>

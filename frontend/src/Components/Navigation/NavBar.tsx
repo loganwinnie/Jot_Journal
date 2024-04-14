@@ -1,9 +1,9 @@
 import { useSelector } from "react-redux";
-import { getSidebarOpen, toggleEntryForm, toggleSidebar } from "../../redux/toggle";
+import { getSidebarOpen, toggleSidebar } from "../../redux/toggle";
 import { useAppDispatch } from "../../redux/hooks";
 import { getUser, logoutUser } from "../../redux/user";
 import { useCreateEntryMutation } from "../../api/entry";
-import { addEntry, setEntry } from "../../redux/entry";
+import { addEntry } from "../../redux/entry";
 
 interface EntryInterface {
   id: string;
@@ -24,15 +24,15 @@ interface EntryInterface {
  * App -> Navbar -> {Link,...}
  */
 function NavBar() {
-  const [createEntry, {isLoading}] = useCreateEntryMutation()
+  const [createEntry] = useCreateEntryMutation()
   const sidebarState = useSelector(getSidebarOpen)
   const {user} = useSelector(getUser)
   const dispatch = useAppDispatch()
 
-  async function handleNewEntry(evt: MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  async function handleNewEntry(evt: { preventDefault: () => void; }): Promise<void> {
     evt.preventDefault();
     try {
-      const entry: EntryInterface = await createEntry(
+      const entry: {entry: EntryInterface} = await createEntry(
         {
           title: null,
           content: null, 
@@ -40,7 +40,7 @@ function NavBar() {
           emoji_name: null, 
         }
       ).unwrap();
-      dispatch(addEntry({entry}))
+      dispatch(addEntry(entry))
     } catch (err) {
         if (err instanceof Array) {
         //   setErrors(err);

@@ -35,7 +35,6 @@ function App() {
         localStorage.setItem("token", token!);
         try {
           if (user) {
-            console.log("QUERY", user)
             dispatch(setUser(user));
           } 
         } catch (err) {

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
-from sqlalchemy import func
+from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
 import uuid
 from config import OPEN_AI_KEY, OPEN_AI_MODEL, OPEN_AI_REQUEST_PER_HOUR
@@ -99,7 +99,12 @@ def delete_user(db: Session, user_id: uuid.UUID):
 
 
 def get_all_user_entries(db: Session, user_id):
-    entries = db.query(models.Entry).filter(models.Entry.owner_id == user_id).all()
+    entries = (
+        db.query(models.Entry)
+        .order_by(desc(models.Entry.updated_at))
+        .filter(models.Entry.owner_id == user_id)
+        .all()
+    )
 
     decrypted_entries = [
         {

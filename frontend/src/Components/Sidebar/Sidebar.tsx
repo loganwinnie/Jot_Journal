@@ -23,6 +23,7 @@ interface EntryInterface {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function Sidebar({entries} : {entries: EntryInterface[]})   {
   const sidebarState = useSelector(getSidebarOpen)
+  
   return (
     <div className={`bg-light-100 border-r-4 ${sidebarState ?"col-span-3" : "col-span-1"} max-h-full overflow-y-scroll no-scrollbar`}>
       {entries && entries.map((entry:EntryInterface, index) => (

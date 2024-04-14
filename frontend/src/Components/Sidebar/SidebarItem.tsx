@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getActive, getEntries, getEntry, setActive } from "../../redux/entry";
+import {getEntries, setActive } from "../../redux/entry";
 
 interface EntryInterface {
   id: string
@@ -28,7 +28,6 @@ function SidebarItem({entry, sidebarOpen, last}: {
   const dispatch = useDispatch()
 
   function updateActive() {
-    console.log("Setting active", entry)
     dispatch(setActive({entry}))
   }
 
@@ -46,6 +45,7 @@ function SidebarItem({entry, sidebarOpen, last}: {
             <div className="rounded-full bg-light-300 opacity-70 w-12 h-12"></div>
           }
           <h1 className="text-xl font-bold font-Raleway">{entry.title || "No Title"}</h1>
+          <p>{entry.updated_at}</p>
         </div>
         )
   }
