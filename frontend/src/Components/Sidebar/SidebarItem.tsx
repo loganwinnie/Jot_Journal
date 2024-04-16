@@ -1,5 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import {getEntries, setActive } from "../../redux/entry";
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+
+TimeAgo.addDefaultLocale(en)
 
 interface EntryInterface {
   id: string
@@ -23,7 +27,7 @@ function SidebarItem({entry, sidebarOpen, last}: {
   last: boolean
   sidebarOpen: boolean
 }) {
-
+  const timeAgo = new TimeAgo('en-US')
   const entries = useSelector(getEntries)
   const dispatch = useDispatch()
 
@@ -45,7 +49,7 @@ function SidebarItem({entry, sidebarOpen, last}: {
             <div className="rounded-full bg-light-300 opacity-70 w-12 h-12"></div>
           }
           <h1 className="text-xl font-bold font-Raleway">{entry.title || "No Title"}</h1>
-          <p>{entry.updated_at}</p>
+          {entry.updated_at && <p>{timeAgo.format(new Date(entry.updated_at))}</p>}
         </div>
         )
   }

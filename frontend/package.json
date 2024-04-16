@@ -15,6 +15,7 @@
     "@reduxjs/toolkit": "^2.2.2",
     "emoji-mart": "^5.5.2",
     "emoji-unicode": "^2.0.1",
+    "javascript-time-ago": "^2.5.9",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "react": "^18.2.0",

@@ -46,3 +46,12 @@ body {
 .read-the-docs {
   color: #888;
 }
+
+::-moz-selection {
+  /* Code for Firefox */
+  background: #b5d7e2;
+}
+
+::selection {
+  background: #b5d7e2;
+}

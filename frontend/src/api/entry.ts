@@ -36,7 +36,7 @@ export const entryApi = apiSlice.injectEndpoints({
       query: (content: string) => ({
         url: "/prompts",
         method: "POST",
-        body: { content: content },
+        body: { prompt: content },
       }),
     }),
   }),

@@ -206,9 +206,9 @@ def delete_user_entry(db: Session, entry_id, user_id):
 
 
 def generate_prompt(db: Session, prompt: str, user_id):
-    if len(prompt.split()) > 250:
+    if len(prompt) > 1000:
         raise HTTPException(
-            status_code=400, detail="Prompts cannot be longer than 250 words."
+            status_code=400, detail="Prompts cannot be longer than 1000 characters."
         )
 
     one_hour = timedelta(hours=1)
@@ -230,17 +230,18 @@ def generate_prompt(db: Session, prompt: str, user_id):
     try:
         response = openai_client.chat.completions.create(
             model=OPEN_AI_MODEL,
-            temperature=2,
+            temperature=0.8,
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a therapeutic assistant. Your role is to facilitate reflection and self-discovery by providing short thought-provoking and unique sentence starters in simple terms based on the user's inputs. These prompts should encourage positive thinking and self-exploration. Do not ask direct questions but offer open-ended sentence starters without punctuation or dots to invite user completion. In case of dangerous inputs or mentions of self-harm, do not engage with the content but prompt the user to seek professional help immediately.",
+                    "content": "You are a therapeutic assistant. Your role is to facilitate reflection and self-discovery by providing short thought-provoking and unique prompts in simple terms based on the user's inputs. These prompts should encourage positive thinking and self-exploration. Do not ask direct questions but offer open-ended prompts without punctuation or dots to invite user completion. In case of dangerous inputs or mentions of self-harm, do not engage with the content but prompt the user to seek professional help immediately. If the user prompts with an incomplete sentence prompt based on continuing the sentence. The prompt should be **OPEN ENDED** for user to complete but not questions and in first person POV. Example: 'Something that has me feeling sad is...' ",
                 },
                 {"role": "user", "content": prompt},
             ],
         )
-
+        print(response)
         response_content = response.choices[0].message.content
+        print("RESPONSE CONTENT", response_content)
         encrypted_prompt = encrypt(response_content)
 
         db_prompt = models.Prompt(

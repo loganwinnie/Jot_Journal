@@ -24,7 +24,7 @@ function TextWall() {
 
 
   return (
-    <div className="absolute z-0 overflow-hidden max-h-full pt-16 max-w-full">
+    <div className="absolute z-0 overflow-hidden max-h-full pt-16 max-w-full select-none">
     {
             longLines.map((line, index) => (
               <div
