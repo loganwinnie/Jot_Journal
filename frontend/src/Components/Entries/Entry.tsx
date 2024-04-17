@@ -5,7 +5,7 @@ import { deleteAndClearEntry, editEntry } from "../../redux/entry";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { init } from "emoji-mart";
-import { useDebouncedCallback } from "use-debounce";
+import { useDebouncedCallback, useThrottledCallback } from "use-debounce";
 import {
   useDeleteEntryMutation,
   useEditEntryMutation,
@@ -60,22 +60,25 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
   const sidebarState = useSelector(getSidebarOpen);
   const dispatch = useDispatch();
   const [togglePicker, setTogglePicker] = useState(false);
-  const [displayContent, setDisplayContent] = useState("");
   const [entrySaved, setEntrySaved] = useState(true);
   const [prompt, setPrompt] = useState<{
     text: null | string;
     regenerate: boolean;
     length: number;
+    error: null;
   }>({
     text: null,
     regenerate: false,
     length: 0,
+    error: null,
   });
 
-  const debouncer = useDebouncedCallback(
+  const debounceUpdate = useDebouncedCallback(
     (value: formInterface) => updateEntry(value),
     1000,
   );
+
+  const debounceGeneration = useThrottledCallback(() => generatePrompt(), 2000);
 
   const initialForm = {
     id: entry?.id || "",
@@ -88,8 +91,7 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
   useEffect(() => {
     function reloadEntry() {
       setFormData(initialForm);
-      setDisplayContent(entry?.content || "");
-      console.log(entry?.id);
+      setTogglePicker(false);
     }
     reloadEntry();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,7 +113,6 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
       content: data,
       entryId: data!.id,
     }).unwrap();
-    console.log(updatedEntry);
     dispatch(editEntry({ entry: updatedEntry.entry }));
   }
 
@@ -122,22 +123,27 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
     setEntrySaved(false);
     // eslint-disable-next-line prefer-const
     let { name, value } = evt.target as HTMLInputElement;
-    if(name === "content") {
-      if (value.length < formData.content.length && prompt.regenerate === true) {
-        value = formData.content.slice(0, formData.content.length- prompt.length)
+    if (name === "content") {
+      if (
+        value.length < formData.content.length &&
+        prompt.regenerate === true
+      ) {
+        value = formData.content.slice(
+          0,
+          formData.content.length - prompt.length,
+        );
       }
-      setDisplayContent(value);
-      setFormData((oldData) => ({ ...oldData, content: value}));
+      setFormData((oldData) => ({ ...oldData, content: value }));
       setPrompt({
         text: null,
         regenerate: false,
-        length: 0
-    })
+        length: 0,
+        error: null,
+      });
     } else {
       setFormData((oldData) => ({ ...oldData, [name]: value }));
     }
-    debouncer({ ...formData, [name]: value });
-
+    debounceUpdate({ ...formData, [name]: value });
   }
 
   function handleEmoji(selected: EmojiInterface) {
@@ -147,7 +153,7 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
       emoji_name: selected.name,
     }));
     setTogglePicker((prev) => !prev);
-    debouncer({
+    debounceUpdate({
       ...formData,
       emoji: selected.native,
       emoji_name: selected.name,
@@ -165,25 +171,40 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
       contentLength > 1000
         ? formData.content.slice(contentLength - 1000)
         : formData.content;
-    
 
-
-    const queryResp: { response: string } =
-      await generatePromptApi(queryChars).unwrap();
-    console.log(queryResp)
-    if(prompt.regenerate) {
-      setFormData((oldData) => ({ ...oldData, content: formData.content.slice(formData.content.length- prompt.length).concat(` ${queryResp.response}`) }));
-    } else {
-      setFormData((oldData) => ({ ...oldData, content: formData.content.concat(` ${queryResp.response}`) }));
+    try {
+      const queryResp: { response: string } =
+        await generatePromptApi(queryChars).unwrap();
+      if (prompt.regenerate) {
+        setFormData((oldData) => ({
+          ...oldData,
+          content: formData.content
+            .slice(formData.content.length - prompt.length)
+            .concat(` ${queryResp.response}`),
+        }));
+      } else {
+        setFormData((oldData) => ({
+          ...oldData,
+          content: formData.content.concat(` ${queryResp.response}`),
+        }));
+      }
+      console.log(queryResp);
+      setPrompt({
+        text: queryResp.response,
+        regenerate: true,
+        length: queryResp.response.length + 1,
+        error: null,
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setPrompt({
+        text: null,
+        regenerate: false,
+        length: 0,
+        error: err.data.detail,
+      });
     }
-    setPrompt({
-      text: queryResp.response,
-      regenerate: true,
-      length: queryResp.response.length + 1,
-    });
-    
   }
-  console.log(formData)
   return (
     <div
       className={`h-full bg-light-100 ${sidebarState ? "col-span-13" : "col-span-15"} px-16 py-4`}
@@ -193,14 +214,14 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
           {entrySaved ? "All changes saved." : "Saving..."}
         </p>
         <div
-          className=" mb-8 flex h-8 w-24 items-center justify-center rounded-md bg-red-300 font-semibold text-primary-500 hover:bg-red-400 active:scale-95"
+          className=" bg-danger mb-8 flex h-8 w-24 items-center justify-center rounded-md font-semibold text-light-100 opacity-80 transition-all duration-100 hover:opacity-95 active:scale-95"
           onClick={() => deleteEntryOnClick()}
         >
           Delete
         </div>
       </div>
       <form action="PATCH" className="flex h-full min-h-full grow flex-col">
-        <div className="absolute">
+        <div className="absolute z-50">
           <label className="label" htmlFor="emoji"></label>
           {togglePicker ? (
             <Picker data={data} onEmojiSelect={handleEmoji} />
@@ -235,15 +256,56 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
           className="textarea pointer-events-none absolute mt-20 max-h-[78%] min-h-[78%] min-w-[65%] max-w-[65%] select-none resize-none text-wrap break-words border-2 text-left
         outline-none"
         >
-          {displayContent} {promptLoading && <span className="text-red-500 inline-block transition-all animate-bounce">generating...</span>} {prompt.text && !promptLoading && <span className="text-secondary-400 transition-all animate-spin">{prompt.text}</span>}
+          {formData.content.slice(0, formData.content.length - prompt.length)}{" "}
+          {promptLoading && (
+            <span className="animate-gradientReveal bg-[0%_100% length:200%_200%] bg-size  inline-block bg-gradient-to-r from-primary-400 to-primary-500 bg-clip-text text-transparent transition-all">
+              generating...
+            </span>
+          )}
+          {prompt.text && !promptLoading && (
+            <span className="text-wrap break-words bg-gradient-to-r from-primary-400 to-primary-500 bg-clip-text text-transparent">
+              {prompt.text}
+            </span>
+          )}
+          {prompt.error && <span className="text-danger">{prompt.error}</span>}
         </p>
       </form>
       <button
-        onClick={generatePrompt}
-        className={`fixed bottom-10 right-10 h-12 w-12 rounded-full bg-secondary-300 ${promptLoading && "animate-spin"}`}
+        onClick={debounceGeneration}
+        className={`fixed bottom-10 right-10 h-12 w-12`}
         disabled={promptLoading}
       >
-        +
+        {promptLoading || prompt.regenerate ? (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className={`fixed bottom-10 right-10 h-14 w-14 text-light-200 ${promptLoading && "animate-spin"} inline-block rounded-full bg-gradient-to-r from-primary-200 to-primary-400 p-2 transition-all duration-150`}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+            />
+          </svg>
+        ) : (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="fixed bottom-10 right-10 h-14 w-14 rounded-lg bg-primary-500 p-3 text-light-200"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+            />
+          </svg>
+        )}
       </button>
     </div>
   );

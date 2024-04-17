@@ -10,11 +10,11 @@ export default {
       },
       colors: {
         primary: {
-          100: "#c8d5ed",
-          200: "#8d9cbc",
-          300: "#607297",
-          400: "#323f59",
-          500: "#1f2b41",
+          100: "#a2cefe",
+          200: "#6cacfc",
+          300: "#609dfb",
+          400: "#5b8fec",
+          500: "#444ca5",
         },
         secondary: {
           100: "#c4ddcd",
@@ -38,6 +38,7 @@ export default {
           500: "#0D0D0D",
         },
         accent: "#79D0F2",
+        danger: "#e45141",
       },
       gridTemplateColumns: {
         16: "repeat(16, minmax(0, 1fr))",
@@ -58,11 +59,20 @@ export default {
         revealLine: {
           to: { width: "100%" },
         },
+        gradientReveal: {
+          "0% 100%": {
+            backgroundPosition: "0% 100%",
+          },
+          "50%": {
+            backgroundPosition: " 100% 0%",
+          },
+        },
       },
       animation: {
         revealLine: "revealLine 5s linear forwards",
         smooth: "SMOOTH 1s ease-in-out normal",
         smooth2: "SMOOTH2 1s ease-in-out normal",
+        gradientReveal: "gradientReveal 2s linear infinite",
       },
     },
   },

@@ -10,45 +10,53 @@ import { getActive, getEntries, setEntries } from "../redux/entry";
 
 /**
  * Renders Home Dashboard if logged in
- * 
+ *
  * App -> Home
  */
 function Home() {
-  const dispatch = useDispatch()
-  const token  = useAppSelector((state) => state.user.token?.access_token)
-  const {data: user} = useGetCurrentUserQuery({});
-  const {data: fetchedEntries, isLoading: entriesLoading} = useGetAllEntriesQuery({});
-  const entries = useSelector(getEntries)
-  const active = useSelector(getActive)
+  const dispatch = useDispatch();
+  const token = useAppSelector((state) => state.user.token?.access_token);
+  const { data: user } = useGetCurrentUserQuery({});
+  const { data: fetchedEntries, isLoading: entriesLoading } =
+    useGetAllEntriesQuery({});
+  const entries = useSelector(getEntries);
+  const active = useSelector(getActive);
 
   /** UseEffect for setting token, entries and user.. */
-  useEffect(function () {
-    async function userInfo() {
+  useEffect(
+    function () {
+      async function userInfo() {
         if (!entriesLoading) {
-          dispatch(setEntries({entries: fetchedEntries.entries}))
+          dispatch(setEntries({ entries: fetchedEntries.entries }));
         }
-      } 
-    userInfo(); 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, user, entriesLoading]);
+      }
+      userInfo();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [token, user, entriesLoading],
+  );
 
   /** Use effect for updating entries */
   useEffect(function () {
     function updateEntries() {
-      dispatch(setEntries({entries: fetchedEntries?.entries}))
-    }  
-    updateEntries()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
+      dispatch(setEntries({ entries: fetchedEntries?.entries }));
+    }
+    updateEntries();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-  <div className="grid grid-cols-16 h-full pt-16 overflow-hidden">
-    {!entriesLoading && <Sidebar entries={entries?.entries}/>}
-    {entries?.active ? <Entry entry={active} /> : "SELECT AN ENTRY"}     
-  </div>
-  )
-
+    <div className="grid h-full grid-cols-16 overflow-hidden pt-16">
+      {!entriesLoading && <Sidebar entries={entries?.entries} />}
+      {entries?.active ? (
+        <Entry entry={active} />
+      ) : (
+        <h1 className="w-40 font-Raleway font-semibold">
+          Create or Select an entry to get started
+        </h1>
+      )}
+    </div>
+  );
 }
 
-export default Home
+export default Home;

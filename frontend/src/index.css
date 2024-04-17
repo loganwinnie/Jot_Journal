@@ -37,4 +37,18 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+
+  .gradient-text {
+    color: #e21143;
+  }
+
+  @supports (background-clip: text) {
+    .gradient-text {
+      background-image: linear-gradient(60deg, #95f9c3, #0b3866);
+      background-size: 200% 200%;
+      background-position: 0% 100%;
+      background-clip: text;
+      color: transparent;
+    }
+  }
 }
