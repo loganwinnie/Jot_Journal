@@ -11,8 +11,9 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 from sqlalchemy.sql import func
+from config import DATABASE_URL
 
-DATABASE_URL = environ.get("DATABASE_URL", "postgresql:///journalai")
+print("DATABASE_URL")
 engine = create_engine(
     DATABASE_URL,
 )
