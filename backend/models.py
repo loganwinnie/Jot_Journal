@@ -1,7 +1,5 @@
 import uuid
-from os import environ
-from sqlalchemy.dialects.postgresql import UUID
-from typing import List, Optional
+from typing import List
 from sqlalchemy import String, ForeignKey, create_engine, types, text, DateTime
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -13,7 +11,6 @@ from sqlalchemy.orm import (
 from sqlalchemy.sql import func
 from config import DATABASE_URL
 
-print("DATABASE_URL")
 engine = create_engine(
     DATABASE_URL,
 )
