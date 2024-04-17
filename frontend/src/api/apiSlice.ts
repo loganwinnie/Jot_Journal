@@ -8,7 +8,7 @@ import {
 import { logoutUser } from "../redux/user";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:8000",
+  baseUrl: import.meta.env?.BACKEND_URL || "http://localhost:8000",
   credentials: "omit",
   prepareHeaders: (headers, { getState }: any) => {
     const token: string = getState().user.token?.access_token;
