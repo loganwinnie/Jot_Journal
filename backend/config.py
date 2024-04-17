@@ -36,6 +36,7 @@ print("")
 print(f"{bcolors.UNDERLINE}{bcolors.GREY} CURRENT ENVIORMENT VARIABLES {bcolors.ENDC}")
 print("")
 print(f"{bcolors.BLUE} HASH_ALGORITHM : {bcolors.CYAN} {HASH_ALGORITHM} {bcolors.ENDC}")
+print(f"{bcolors.BLUE} DATABASE_URL : {bcolors.CYAN} {DATABASE_URL} {bcolors.ENDC}")
 print(f"{bcolors.BLUE} OPEN_AI_MODEL : {bcolors.CYAN} {OPEN_AI_MODEL} {bcolors.ENDC}")
 print(
     f"{bcolors.BLUE} ACCESS_TOKEN_TIME : {bcolors.CYAN} {ACCESS_TOKEN_TIME} {bcolors.ENDC}"
