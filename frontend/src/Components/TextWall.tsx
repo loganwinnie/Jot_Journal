@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import { longLines } from "../text.tsx";
 
-//0.0125
 /**
  * Component for background wall of text
+ *
  * HomeAnon -> TextWall
  */
 function TextWall() {
@@ -16,11 +16,11 @@ function TextWall() {
       containerRef.current.forEach((line) => {
         if (line) {
           line.style.animationDelay = `${delay}s`;
-          delay += (line.textContent?.split(" ").length || 0) * 0.001;
+          delay += (line.textContent?.split(" ").length || 0) * 0.0125;
         }
       });
     }
-  }, [longLines]);
+  }, []);
 
   return (
     <div className="absolute z-0 max-h-[150%] max-w-full select-none overflow-hidden pt-16 lg:max-h-full">

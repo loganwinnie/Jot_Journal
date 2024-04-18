@@ -25,10 +25,6 @@ interface TokenInterface {
 /**
  *  Component, Form for signing up an user.
  *
- * Props:
- *  signup: Function for signup a user.
- *  displayErrors: Function for setting errors
- *
  * State:
  *  formData: data input from form. Matches initial state fields
  *

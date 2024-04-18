@@ -1,5 +1,6 @@
 import { apiSlice } from "./apiSlice";
 
+/** Slice for auth endpoints */
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     signup: builder.mutation({

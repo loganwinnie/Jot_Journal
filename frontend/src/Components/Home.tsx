@@ -6,7 +6,7 @@ import { useGetCurrentUserQuery } from "../api/auth";
 import { useEffect } from "react";
 import { useGetAllEntriesQuery } from "../api/entry";
 import Entry from "./Entries/Entry";
-import { getActive, getEntries, setEntries } from "../redux/entry";
+import { getActive, getEntry, setEntries } from "../redux/entry";
 
 /**
  * Renders Home Dashboard if logged in
@@ -19,7 +19,7 @@ function Home() {
   const { data: user } = useGetCurrentUserQuery({});
   const { data: fetchedEntries, isLoading: entriesLoading } =
     useGetAllEntriesQuery({});
-  const entries = useSelector(getEntries);
+  const entries = useSelector(getEntry);
   const active = useSelector(getActive);
 
   /** UseEffect for setting token, entries and user.. */
@@ -33,6 +33,7 @@ function Home() {
       userInfo();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [token, user, entriesLoading],
   );
 

@@ -2,10 +2,8 @@ import AuthArea from "./Authentication/AuthArea";
 import TextWall from "./TextWall";
 /**
  * Renders Home Screen if Logged out
- * State:
- *  user: User Object
  *
- * App -> Home
+ * App -> Home -> Auth Area
  */
 function HomeAnon() {
   return (

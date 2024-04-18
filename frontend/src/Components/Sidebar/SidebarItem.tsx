@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getEntries, setActive } from "../../redux/entry";
+import { getEntry, setActive } from "../../redux/entry";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 
@@ -17,10 +17,12 @@ interface EntryInterface {
 /**
  * Renders Side bar For entries
  *
- * Context:
- *  user: userContext
+ * props:
+ *  entry: entry. (object)
+ *  sidebarOpen: state of sidebar. (boolean)
+ *  last: determines conditional rendering of last entry in sidebar. (boolean)
  *
- * App -> Sidebar ->SidebarItem
+ * Sidebar ->SidebarItem
  */
 function SidebarItem({
   entry,
@@ -32,13 +34,15 @@ function SidebarItem({
   sidebarOpen: boolean;
 }) {
   const timeAgo = new TimeAgo("en-US");
-  const entries = useSelector(getEntries);
+  const entries = useSelector(getEntry);
   const dispatch = useDispatch();
 
+  /** updateActive: function that updates active entry on click */
   function updateActive() {
     dispatch(setActive({ entry }));
   }
 
+  /** Renders if sidebar is open. */
   function ifOpen() {
     return (
       entry && (
@@ -66,6 +70,7 @@ function SidebarItem({
       )
     );
   }
+  /** Renders if sidebar is closed. */
   function ifClosed() {
     return (
       entry && (

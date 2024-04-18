@@ -1,6 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-// import type { PayloadAction } from '@reduxjs/toolkit'
-// import type { RootState } from './store'
 
 interface ToggleInterface {
   authForm: boolean;
@@ -9,13 +7,6 @@ interface ToggleInterface {
   sidebar: boolean;
   loading: boolean;
 }
-
-// interface ToggleState {
-//     login: false
-//     signup: false
-//     entry: false
-//     sidebar: false
-// }
 
 const initialState: ToggleInterface = {
   authForm: true,
@@ -30,12 +21,6 @@ const toggleSlice = createSlice({
   initialState,
   reducers: {
     /** Boolean: True for login form, false for signup */
-    toggleEntryForm: (state) => {
-      state.entryForm = !state.entryForm;
-    },
-    toggleEntry: (state) => {
-      state.entry = !state.entry;
-    },
     toggleSidebar: (state) => {
       state.sidebar = !state.sidebar;
     },
@@ -45,16 +30,14 @@ const toggleSlice = createSlice({
   },
 });
 
-export const { toggleEntry, toggleSidebar, toggleLoading, toggleEntryForm } =
-  toggleSlice.actions;
+export const { toggleSidebar, toggleLoading } = toggleSlice.actions;
 
 export default toggleSlice.reducer;
 
-export const getEntryOpen = (state: { toggle: { entry: boolean } }) =>
-  state.toggle.entry;
-export const getEntryFormOpen = (state: { toggle: { entryForm: boolean } }) =>
-  state.toggle.entryForm;
+/**getSidebarOpen:  get state of sidebar */
 export const getSidebarOpen = (state: { toggle: { sidebar: boolean } }) =>
   state.toggle.sidebar;
+
+/**getLoading:  get state of loading */
 export const getLoading = (state: { toggle: { loading: boolean } }) =>
   state.toggle.loading;

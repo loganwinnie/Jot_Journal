@@ -7,6 +7,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { logoutUser } from "../redux/user";
 
+/** base query for API */
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env?.VITE_BACKEND_URL || "http://localhost:8000",
   credentials: "omit",
@@ -19,6 +20,9 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
+/** If error when retrieving or validating user token will logout the user and return to
+ *  Anon Homepage
+ */
 const logoutIfUnauth = async (
   args: string | FetchArgs,
   api: BaseQueryApi,

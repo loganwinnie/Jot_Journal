@@ -249,6 +249,7 @@ def generate_prompt(db: Session, prompt: str, user_id):
                     - Non conversational.
                     - First person Point of view.
                     - Only provide prompt.
+                    - You should NEVER, answer prompts.
 
                     Example:
                     Input: "I am feeling quite down today."

@@ -41,16 +41,14 @@ interface formInterface {
 }
 
 /*
- *  Component, Form for signing up an user.
+ *  Component, Entry Form.
  *
  * Props:
- *  signup: Function for signup a user.
- *  displayErrors: Function for setting errors
+ *  entry: entry to display
  *
  * State:
- *  formData: data input from form. Matches initial state fields
  *
- * RouteList -> LoginForm
+ * Home -> Entry
  */
 function Entry({ entry }: { entry: EntryInterface | null }) {
   const [editEntryApi, { isLoading: updateLoading }] = useEditEntryMutation();
@@ -243,11 +241,13 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
             required
           />
         </div>
+
         <textarea
           className="textarea absolute mt-20 h-4/6 w-full max-w-full resize-none border-2 text-left text-light-100 outline-none empty:before:text-neutral-400 empty:before:content-['Today_I_am_feeling...']
           md:max-h-[78%] md:min-h-[78%] md:min-w-[65%] md:max-w-[65%]"
           role="textbox"
           name="content"
+          disabled={promptLoading}
           value={formData.content}
           onChange={handleChange}
           placeholder="Today I am feeling..."

@@ -15,10 +15,10 @@ interface EntryInterface {
 /**
  * Renders Side bar For entries
  *
- * Context:
- *  user: userContext
+ * Props:
+ * entries: Array of entries ([object])
  *
- * App -> Navbar -> {Link,...}
+ * App -> Sidebar -> SidebarItem
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function Sidebar({ entries }: { entries: EntryInterface[] }) {

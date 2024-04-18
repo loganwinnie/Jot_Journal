@@ -17,10 +17,8 @@ interface TokenInterface {
  *  Component, Form for logining in an user.
  *
  * Props:
- * login: Function for user login.
  *
  * State:
- *  errors: Array of error objects created when submitting form.
  *  formData: data input from form. Matches initial state fields
  *
  * RouteList -> LoginForm
@@ -33,7 +31,6 @@ function LoginForm() {
     username: "",
     password: "",
   });
-  //   const [errors, setErrors] = useState<null | Array<string>>(null);
 
   /** handleChange: Handles change of form field.*/
   function handleChange(evt: React.FormEvent<HTMLInputElement>) {

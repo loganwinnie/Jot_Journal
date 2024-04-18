@@ -18,9 +18,10 @@ const initialState: {
   entries: [],
 };
 
+/** Entry slice for entry state */
 const entrySlice = createSlice({
   name: "entry",
-  // `createSlice` will infer the state type from the `initialState` argument
+
   initialState,
   reducers: {
     setActive: (
@@ -113,15 +114,7 @@ export const {
 
 export default entrySlice.reducer;
 
-export const getEntries = (state: {
-  entry: {
-    active: EntryInterface | null;
-    entries: EntryInterface[];
-  };
-}) => {
-  return state.entry;
-};
-
+/** getEntry: gets user entry object */
 export const getEntry = (state: {
   entry: {
     active: EntryInterface | null;
@@ -130,6 +123,8 @@ export const getEntry = (state: {
 }) => {
   return state.entry;
 };
+
+/** getActive: Gets user active entry */
 export const getActive = (state: {
   entry: {
     active: EntryInterface | null;

@@ -1,5 +1,6 @@
 import { apiSlice } from "./apiSlice";
 
+/** Slice for entry and prompt endpoints */
 export const entryApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createEntry: builder.mutation({
