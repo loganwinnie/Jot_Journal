@@ -207,21 +207,21 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
   }
   return (
     <div
-      className={`h-full bg-light-100 ${sidebarState ? "col-span-13" : "col-span-15"} px-16 py-4`}
+      className={`h-full bg-light-100 ${sidebarState ? "col-span-13" : "col-span-15"} py-4 md:px-16`}
     >
-      <div className="flex justify-between">
+      <div className="mx-8 flex justify-between md:mx-0">
         <p className="mb-4 flex text-light-400">
           {entrySaved ? "All changes saved." : "Saving..."}
         </p>
         <div
-          className=" bg-danger mb-8 flex h-8 w-24 items-center justify-center rounded-md font-semibold text-light-100 opacity-80 transition-all duration-100 hover:opacity-95 active:scale-95"
+          className=" mb-8 flex h-8 w-24 items-center justify-center rounded-md bg-danger font-semibold text-light-100 opacity-80 transition-all duration-100 hover:opacity-95 active:scale-95"
           onClick={() => deleteEntryOnClick()}
         >
           Delete
         </div>
       </div>
-      <form action="PATCH" className="flex h-full min-h-full grow flex-col">
-        <div className="absolute z-50">
+      <form action="PATCH" className=" flex h-full min-h-full grow flex-col">
+        <div className="absolute z-50 mx-4 md:mx-0">
           <label className="label" htmlFor="emoji"></label>
           {togglePicker ? (
             <Picker data={data} onEmojiSelect={handleEmoji} />
@@ -244,8 +244,8 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
           />
         </div>
         <textarea
-          className="textarea absolute mt-20 max-h-[78%] min-h-[78%] min-w-[65%] max-w-[65%] resize-none border-2 text-left text-light-100
-          outline-none empty:before:text-neutral-400 empty:before:content-['Today_I_am_feeling...']"
+          className="textarea absolute mt-20 h-4/6 w-full max-w-full resize-none border-2 text-left text-light-100 outline-none empty:before:text-neutral-400 empty:before:content-['Today_I_am_feeling...']
+          md:max-h-[78%] md:min-h-[78%] md:min-w-[65%] md:max-w-[65%]"
           role="textbox"
           name="content"
           value={formData.content}
@@ -253,12 +253,12 @@ function Entry({ entry }: { entry: EntryInterface | null }) {
           placeholder="Today I am feeling..."
         ></textarea>
         <p
-          className="textarea pointer-events-none absolute mt-20 max-h-[78%] min-h-[78%] min-w-[65%] max-w-[65%] select-none resize-none text-wrap break-words border-2 text-left
-        outline-none"
+          className="textarea pointer-events-none absolute mt-20 h-4/6 w-full max-w-full select-none resize-none text-wrap break-words border-2 text-left outline-none
+        md:max-h-[78%] md:min-h-[78%] md:min-w-[65%] md:max-w-[65%]"
         >
           {formData.content.slice(0, formData.content.length - prompt.length)}{" "}
           {promptLoading && (
-            <span className="animate-gradientReveal bg-[0%_100% length:200%_200%] bg-size  inline-block bg-gradient-to-r from-primary-400 to-primary-500 bg-clip-text text-transparent transition-all">
+            <span className="bg-[0%_100% length:200%_200%] bg-size inline-block  animate-gradientReveal bg-gradient-to-r from-primary-400 to-primary-500 bg-clip-text text-transparent transition-all">
               generating...
             </span>
           )}

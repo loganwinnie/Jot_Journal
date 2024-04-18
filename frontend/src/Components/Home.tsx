@@ -46,7 +46,7 @@ function Home() {
   }, []);
 
   return (
-    <div className="grid h-full grid-cols-16 overflow-hidden pt-16">
+    <div className="flex h-full flex-col overflow-hidden pt-16 md:grid md:grid-cols-16">
       {!entriesLoading && <Sidebar entries={entries?.entries} />}
       {entries?.active ? (
         <Entry entry={active} />
