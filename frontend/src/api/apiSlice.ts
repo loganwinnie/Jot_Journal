@@ -7,10 +7,10 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { logoutUser } from "../redux/user";
 
-console.log(import.meta.env.BACKEND_URL || import.meta.env);
+console.log("Backend URL", import.meta.env.VITE_BACKEND_URL || import.meta.env);
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env?.BACKEND_URL || "http://localhost:8000",
+  baseUrl: import.meta.env?.VITE_BACKEND_URL || "http://localhost:8000",
   credentials: "omit",
   prepareHeaders: (headers, { getState }: any) => {
     const token: string = getState().user.token?.access_token;

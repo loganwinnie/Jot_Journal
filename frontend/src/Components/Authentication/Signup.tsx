@@ -50,7 +50,6 @@ function SignupForm() {
   async function handleSubmit(evt: React.FormEvent<HTMLFormElement>) {
     evt.preventDefault();
     try {
-      console.log(formData);
       const token: TokenInterface = await signup(formData).unwrap();
       setFormData(initialState);
       navigate("/");
