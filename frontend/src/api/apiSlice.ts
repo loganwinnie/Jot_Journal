@@ -7,6 +7,8 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { logoutUser } from "../redux/user";
 
+console.log(import.meta.env.BACKEND_URL || import.meta.env);
+
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env?.BACKEND_URL || "http://localhost:8000",
   credentials: "omit",
