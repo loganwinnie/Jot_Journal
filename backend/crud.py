@@ -9,7 +9,6 @@ import bcrypt
 from util import decrypt, encrypt, hash_password
 from openai import OpenAI
 
-print(OPEN_AI_MODEL)
 openai_client = OpenAI(api_key=OPEN_AI_KEY)
 
 
@@ -169,7 +168,6 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
     db_entry.emoji = entry.emoji if entry.emoji else None
     db_entry.emoji_name = entry.emoji_name if entry.emoji_name else None
     db_entry.updated_at = func.now()
-    print("CONTENT,", encrypt(entry.content) if entry.content else None)
     db.commit()
     db.refresh(db_entry)
     decrypted_entry = {
@@ -182,7 +180,6 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
         "content": decrypt(db_entry.content) if entry.content else None,
         "title": db_entry.title,
     }
-    print("entry:", decrypted_entry)
     return decrypted_entry
 
 
@@ -264,9 +261,7 @@ def generate_prompt(db: Session, prompt: str, user_id):
                 {"role": "user", "content": prompt},
             ],
         )
-        print(response)
         response_content = response.choices[0].message.content
-        print("RESPONSE CONTENT", response_content)
         encrypted_prompt = encrypt(response_content)
 
         db_prompt = models.Prompt(
