@@ -14,6 +14,9 @@ openai_client = OpenAI(api_key=OPEN_AI_KEY)
 
 def get_user(db: Session, user_id: uuid.UUID):
     user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
     return {
         "created_at": user.created_at,
         "email": user.email,
@@ -25,34 +28,48 @@ def get_user(db: Session, user_id: uuid.UUID):
 
 def get_user_by_email(db: Session, email: str):
     user = db.query(models.User).filter(models.User.email == email).first()
-    return (
-        {
-            "created_at": user.created_at,
-            "email": user.email,
-            "first_name": user.first_name,
-            "id": user.id,
-            "last_name": user.last_name,
-        }
-        if user
-        else None
-    )
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return {
+        "created_at": user.created_at,
+        "email": user.email,
+        "first_name": user.first_name,
+        "id": user.id,
+        "last_name": user.last_name,
+    }
 
 
 def create_user(db: Session, user: schemas.UserCreate):
+    print(user)
     salt = bcrypt.gensalt()
-    hashed_password = hash_password(user.password, salt=salt)
+    hashed_password = hash_password(user["password"], salt=salt)
 
     db_user = models.User(
-        email=user.email,
+        email=user["email"],
         password=str(hashed_password, "utf-8"),
-        first_name=user.first_name,
-        last_name=user.last_name,
+        first_name=user["first_name"],
+        last_name=user["last_name"],
         salt=salt,
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def delete_user(db: Session, user_id: uuid.UUID):
+    db_user = (
+        db.query(models.Entry)
+        .filter(
+            models.User.id == user_id,
+        )
+        .first()
+    )
+    if not db_user:
+        raise HTTPException(status_code=404, detail=f"Entry not found.")
+    db.delete(db_user)
+    db.commit()
+    return user_id
 
 
 def create_user_entry(db: Session, entry, user_id):
@@ -80,21 +97,6 @@ def create_user_entry(db: Session, entry, user_id):
         "content": decrypt(entry.content) if entry.content else None,
         "title": entry.title,
     }
-
-
-def delete_user(db: Session, user_id: uuid.UUID):
-    db_user = (
-        db.query(models.Entry)
-        .filter(
-            models.User.id == user_id,
-        )
-        .first()
-    )
-    if not db_user:
-        raise HTTPException(status_code=404, detail=f"Entry not found.")
-    db.delete(db_user)
-    db.commit()
-    return user_id
 
 
 def get_all_user_entries(db: Session, user_id):

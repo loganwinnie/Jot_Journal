@@ -8,6 +8,13 @@ import models
 
 
 def hash_password(password, salt):
+    """
+    params:
+        password: Password to hash
+        salt: Salt for encoding
+    returns;
+        hashed_password: Password hashed
+    """
     return bcrypt.hashpw(
         password.encode("utf-8"),
         salt=salt,
@@ -15,9 +22,17 @@ def hash_password(password, salt):
 
 
 def authenticate_user(email, password, db):
-    db_user = db.query(models.User).filter(models.User.email == email).first()
+    """
+    params:
+        email: User email
+        password: User password
+        db: active database
+    returns:
+        db_user: user from database
+    """
+    db_user = db.query(models.User).filter(models.User.email == email.lower()).first()
     if not db_user:
-        raise HTTPException(status_code=400, detail="Account does not exist.")
+        raise HTTPException(status_code=404, detail="Account does not exist.")
     print(db_user)
     hashed_password = hash_password(password=password, salt=db_user.salt)
     if str(hashed_password, "utf-8") != db_user.password:
@@ -25,7 +40,17 @@ def authenticate_user(email, password, db):
     return db_user
 
 
-def create_token(data, expires: timedelta = ACCESS_TOKEN_TIME):
+def create_token(
+    data: dict["email":str, "first_name":str, "last_name":str, "id" : int or str],
+    expires: int | str = ACCESS_TOKEN_TIME,
+):
+    """
+    params:
+        data: User data to be tokenized
+        expires: Integer or string(converted to int) for minutes to expiration
+    returns:
+        token: JWT encoded token
+    """
     delta = timedelta(minutes=expires)
     adjusted_time = datetime.now(timezone.utc) + delta
     encode = {
@@ -33,7 +58,6 @@ def create_token(data, expires: timedelta = ACCESS_TOKEN_TIME):
             "email": data.email,
             "first_name": data.first_name,
             "last_name": data.last_name,
-            "created_at": data.created_at.isoformat(),
         },
         "id": str(data.id),
         "exp": adjusted_time,
@@ -47,14 +71,25 @@ def create_token(data, expires: timedelta = ACCESS_TOKEN_TIME):
 
 
 def encrypt(message):
+    """
+    params:
+        message: String to be encrypted using Fernet encryption
+    returns:
+        encMessage: Encrypted message
+    """
     fernet = Fernet(key=ENCRYPT_KEY)
     encMessage = fernet.encrypt(message.encode())
     return encMessage
 
 
-def decrypt(encoded_message):
+def decrypt(encrypted_message):
+    """
+    params:
+        encrypted_message: String to be decrypted using Fernet encryption
+    returns:
+        decrypted_message: Decrypted message
+    """
     fernet = Fernet(key=ENCRYPT_KEY)
-    print("ENCODED", encoded_message)
-    message = fernet.decrypt(encoded_message)
-    decoded_message = message.decode()
-    return decoded_message
+    message = fernet.decrypt(encrypted_message)
+    decrypted_message = message.decode()
+    return decrypted_message

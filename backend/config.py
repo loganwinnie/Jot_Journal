@@ -1,4 +1,5 @@
 from os import environ
+import sys
 from dotenv import load_dotenv
 
 
@@ -30,6 +31,9 @@ OPEN_AI_REQUEST_PER_HOUR = int(environ.get("OPEN_AI_REQUEST_PER_HOUR", 20))
 ENCRYPT_KEY = environ.get("ENCRYPT_KEY", "blahblahblah")
 ALLOWED_ORIGIN = environ.get("ALLOWED_ORIGIN", "*")
 DATABASE_URL = environ.get("DATABASE_URL", "postgresql:///journalai")
+
+if "pytest" in sys.modules:
+    DATABASE_URL = "postgresql:///test_journalai"
 
 ### Printing Env variables on server start
 print("")
