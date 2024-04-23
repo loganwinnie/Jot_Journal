@@ -40,46 +40,46 @@ def get_user_by_email(db: Session, email: str):
 
 
 def create_user(db: Session, user: schemas.UserCreate):
-    print(user)
     salt = bcrypt.gensalt()
     hashed_password = hash_password(user["password"], salt=salt)
-
-    db_user = models.User(
-        email=user["email"],
-        password=str(hashed_password, "utf-8"),
-        first_name=user["first_name"],
-        last_name=user["last_name"],
-        salt=salt,
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    try:
+        db_user = models.User(
+            email=user["email"],
+            password=str(hashed_password, "utf-8"),
+            first_name=user["first_name"],
+            last_name=user["last_name"],
+            salt=salt,
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except Exception as err:
+        raise err
 
 
 def delete_user(db: Session, user_id: uuid.UUID):
     db_user = (
-        db.query(models.Entry)
+        db.query(models.User)
         .filter(
             models.User.id == user_id,
         )
         .first()
     )
     if not db_user:
-        raise HTTPException(status_code=404, detail=f"Entry not found.")
+        raise HTTPException(status_code=404, detail=f"User not found.")
     db.delete(db_user)
     db.commit()
     return user_id
 
 
-def create_user_entry(db: Session, entry, user_id):
-
-    content = encrypt(entry.content) if entry.content else None
+def create_user_entry(db: Session, entry: schemas.EntryCreate, user_id):
+    content = encrypt(entry["content"]) if entry["content"] else None
     db_entry = models.Entry(
-        title=entry.title,
+        title=entry["title"],
         content=content,
-        emoji=entry.emoji,
-        emoji_name=entry.emoji_name,
+        emoji=entry["emoji"],
+        emoji_name=entry["emoji_name"],
         owner_id=user_id,
     )
 
@@ -94,8 +94,8 @@ def create_user_entry(db: Session, entry, user_id):
         "owner_id": db_entry.owner_id,
         "emoji": db_entry.emoji,
         "emoji_name": db_entry.emoji_name,
-        "content": decrypt(entry.content) if entry.content else None,
-        "title": entry.title,
+        "content": decrypt(db_entry.content) if db_entry.content else None,
+        "title": db_entry.title,
     }
 
 
@@ -165,7 +165,7 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
         raise HTTPException(
             status_code=401, detail=f"Cannot modify other user entries."
         )
-    db_entry.content = encrypt(entry.content) if entry.content else None
+    db_entry.content = encrypt(entry["content"]) if entry.content else None
     db_entry.title = entry.title if entry.title else None
     db_entry.emoji = entry.emoji if entry.emoji else None
     db_entry.emoji_name = entry.emoji_name if entry.emoji_name else None

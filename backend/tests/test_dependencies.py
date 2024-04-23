@@ -8,9 +8,6 @@ from _test_utilities import create_fake_user
 from dependencies import get_current_user
 
 pytest_plugins = ("pytest_asyncio",)
-"""Run tests with:
-python -m pytest tests/
-"""
 
 
 class testGetCurrentUser(TestCase):
