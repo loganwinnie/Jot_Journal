@@ -1,6 +1,6 @@
 import bcrypt
 import models
-from util import hash_password
+from util import encrypt, hash_password
 
 """Run tests with:
 python -m pytest tests/
@@ -15,12 +15,12 @@ def drop_and_recreate_tables():
     models.Base.metadata.create_all(bind=models.engine)
 
 
-def create_fake_user(db):
+def create_fake_user(db, email="test@email.com"):
     salt = bcrypt.gensalt()
     hashed_password = hash_password("password", salt=salt)
 
     db_user = models.User(
-        email="test@email.com",
+        email=email,
         password=str(hashed_password, "utf-8"),
         first_name="Test",
         last_name="User",
@@ -30,10 +30,12 @@ def create_fake_user(db):
     return db_user
 
 
-def create_fake_entry(db, user):
+def create_fake_entry(db, user, title="TestEntry"):
+    content = encrypt("Hello World")
+
     db_entry = models.Entry(
-        title="Test Entry",
-        content="Hello World",
+        title=title,
+        content=content,
         emoji=None,
         emoji_name=None,
         owner_id=user.id,

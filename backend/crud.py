@@ -128,7 +128,6 @@ def get_entry(db: Session, user_id, entry_id):
     entry = (
         db.query(models.Entry)
         .filter(
-            models.Entry.owner_id == user_id,
             models.Entry.id == entry_id,
         )
         .first()
@@ -165,10 +164,11 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
         raise HTTPException(
             status_code=401, detail=f"Cannot modify other user entries."
         )
-    db_entry.content = encrypt(entry["content"]) if entry.content else None
-    db_entry.title = entry.title if entry.title else None
-    db_entry.emoji = entry.emoji if entry.emoji else None
-    db_entry.emoji_name = entry.emoji_name if entry.emoji_name else None
+    content = entry.get("content", None)
+    db_entry.content = encrypt(content) if content else None
+    db_entry.title = entry.get("title", None)
+    db_entry.emoji = entry.get("emoji", None)
+    db_entry.emoji_name = entry.get("emoji_name", None)
     db_entry.updated_at = func.now()
     db.commit()
     db.refresh(db_entry)
@@ -179,7 +179,7 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
         "emoji": db_entry.emoji,
         "emoji_name": db_entry.emoji_name,
         "owner_id": db_entry.owner_id,
-        "content": decrypt(db_entry.content) if entry.content else None,
+        "content": decrypt(db_entry.content) if content else None,
         "title": db_entry.title,
     }
     return decrypted_entry
@@ -225,6 +225,7 @@ def generate_prompt(db: Session, prompt: str, user_id):
         raise HTTPException(
             status_code=429, detail="Too many request in past hour. Please wait."
         )
+    print("CLIENT", openai_client.chat, OPEN_AI_MODEL)
 
     try:
         response = openai_client.chat.completions.create(
@@ -265,8 +266,8 @@ def generate_prompt(db: Session, prompt: str, user_id):
             ],
         )
         response_content = response.choices[0].message.content
+        print("RESP:", response, response_content)
         encrypted_prompt = encrypt(response_content)
-
         db_prompt = models.Prompt(
             id=response.id,
             content=encrypted_prompt,
@@ -279,5 +280,5 @@ def generate_prompt(db: Session, prompt: str, user_id):
         db.refresh(db_prompt)
 
         return response_content
-    except:
+    except Exception as err:
         raise HTTPException(status_code=500, detail="Error generating prompt.")
