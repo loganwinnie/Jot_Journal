@@ -1,6 +1,7 @@
 from typing import Annotated
 from fastapi import Depends, HTTPException, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
+import models
 from sqlalchemy.orm import Session
 from dependencies import get_db
 import schemas, crud
@@ -16,13 +17,12 @@ router = APIRouter(
 
 @router.post("/register")
 def create(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_email(db=db, email=user.email)
+    db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
         raise HTTPException(
             status_code=400, detail="An account already exists with this email."
         )
     created_user = crud.create_user(db=db, user=user)
-
     return {"access_token": create_token(created_user), "token_type": "bearer"}
 
 

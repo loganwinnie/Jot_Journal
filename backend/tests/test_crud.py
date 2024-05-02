@@ -1,4 +1,5 @@
 import datetime
+import os
 from unittest import TestCase, mock
 import uuid
 from fastapi import HTTPException
@@ -10,6 +11,7 @@ from _test_utilities import (
     create_fake_entry,
 )
 from crud import openai_client
+import config
 
 
 db = models.SessionLocal()
@@ -445,28 +447,11 @@ class TestDeleteEntry(TestCase):
                 db=self.db_session, user_id=self.user.id, entry_id=self.entry_other.id
             )
 
-
-class Chat:
-    def __init__(self):
-        self.completions = self.Completions()
-
-    class Completions:
-        def __init__(self):
-            self._response = self.Response()
-
-        def create(self, *arg, **kwargs):
-            return self._response
-
-        class Response:
-            def __init__(self):
-                self.choices = {"message": {"content": "test API return"}}
-                self.id = "1"
+            # return_value='{"choices": [{"message": {"content": "test prompt"}}], "id": "1"}',
 
 
 class TestGeneratePrompt(TestCase):
     def setUp(self):
-        self.mock_client = mock.patch.object(openai_client, "chat", Chat())
-
         drop_and_recreate_tables()
         models.Base.metadata.create_all(bind=models.engine)
         self.db_session = models.SessionLocal()
@@ -480,31 +465,79 @@ class TestGeneratePrompt(TestCase):
         drop_and_recreate_tables()
 
     # Test Cases:
+    @mock.patch.object(
+        openai_client,
+        "chat",
+    )
+    def test_works(self, mock_openai_client):
+        mock_openai_client.completions.create.return_value = (
+            '{"choices": [{"message": {"content": "test prompt"}}], "id": "1"}'
+        )
+        prompt = crud.generate_prompt(
+            db=self.db_session, prompt="test query", user_id=self.user.id
+        )
+        assert prompt == "test prompt"
 
-    def test_works(self):
-        with self.mock_client:
-            prompt = crud.generate_prompt(
-                db=self.db_session, prompt="test query", user_id=self.user.id
+    @mock.patch.object(
+        openai_client,
+        "chat",
+    )
+    def test_404_invalid_user(self, mock_openai_client):
+        fake_uuid = uuid.uuid4()
+
+        mock_openai_client.completions.create.return_value = (
+            '{"choices": [{"message": {"content": "test prompt"}}], "id": "1"}'
+        )
+
+        with pytest.raises(
+            HTTPException,
+            match="404: User not found.",
+        ):
+            crud.generate_prompt(
+                db=self.db_session, prompt="test query", user_id=fake_uuid
             )
-            assert prompt == "test API return"
 
-    # def test_404_no_entry(self):
-    #     fake_uuid = uuid.uuid4()
+    @mock.patch.object(
+        openai_client,
+        "chat",
+    )
+    def test_entry_too_long(self, mock_openai_client):
+        mock_openai_client.completions.create.return_value = (
+            '{"choices": [{"message": {"content": "test prompt"}}], "id": "1"}'
+        )
+        with pytest.raises(
+            HTTPException,
+            match="Prompts cannot be longer than 1000 characters.",
+        ):
+            crud.generate_prompt(
+                db=self.db_session,
+                prompt="""Once upon a time in the mystical lands of Eldoria, there was a secluded village known as Whispering Pines. It was encircled by towering pine trees whose tops seemed to touch the sky. The villagers, simple and kind-hearted folk, lived in harmony with nature, their lives intricately woven with the rhythms of the earth.
 
-    #     with pytest.raises(
-    #         HTTPException,
-    #         match="Entry not found.",
-    #     ):
-    #         crud.delete_user_entry(
-    #             db=self.db_session, user_id=self.user.id, entry_id=fake_uuid
-    #         )
+                In the heart of Whispering Pines lived an old sage named Elrin. With a long, flowing beard and wise, twinkling eyes, he was revered by all for his knowledge of ancient lore and natural magic. Elrin spent his days in his cozy stone cottage, surrounded by old books and strange artifacts collected from his youthful adventures.
 
-    # def test_401_other_user_entry(self):
+                One crisp autumn evening, as the village was bathed in the golden hues of the setting sun, a mysterious traveler arrived. Cloaked in a garment of midnight blue, the traveler's presence brought an air of intrigue and suspense. Little did the villagers know, this stranger would unveil a secret that would change Whispering Pines forever.
 
-    #     with pytest.raises(
-    #         HTTPException,
-    #         match="Cannot delete other user entries.",
-    #     ):
-    #         crud.delete_user_entry(
-    #             db=self.db_session, user_id=self.user.id, entry_id=self.entry_other.id
-    #         )
+                As night fell, the villagers gathered around a crackling fire in the village square to hear the traveler's tale. With a voice as soft as the wind through the pines, the traveler began to weave a story of lost empires, hidden treasures, and spells so powerful they could bend the will of time.""",
+                user_id=self.user.id,
+            )
+
+    @mock.patch.object(
+        openai_client,
+        "chat",
+    )
+    def test_error_too_many_request(self, mock_openai_client):
+        with pytest.raises(
+            HTTPException,
+            match="Too many request in past hour. Please wait.",
+        ):
+            count = 0
+            while count <= config.OPEN_AI_REQUEST_PER_HOUR:
+                mock_openai_client.completions.create.return_value = (
+                    '{"choices": [{"message": {"content": "test prompt"}}], "id":'
+                    + f'"{count}"'
+                    + "}"
+                )
+                crud.generate_prompt(
+                    db=self.db_session, prompt="test query", user_id=self.user.id
+                )
+                count += 1

@@ -31,7 +31,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[HASH_ALGORITHM])
         user = payload.get("sub", None)
         user_id = payload.get("id", None)
-        if not user or not user_id:
+        if (not user or not user_id) and (user.id != user_id):
             raise HTTPException(status_code=401, detail="Failed to authenticate user.")
         return {"user": user, "user_id": user_id}
     except:

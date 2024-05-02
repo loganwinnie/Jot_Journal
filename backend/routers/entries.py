@@ -35,6 +35,16 @@ def get_entry(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
+@router.post("/")
+def create(
+    entry: schemas.EntryCreate,
+    req=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    entry = crud.create_user_entry(db=db, entry=entry, user_id=req["user_id"])
+    return {"entry": entry}
+
+
 @router.patch("/{entry_id}")
 def patch_entry(
     entry_id: Annotated[uuid.UUID, Path(title="The entry ID of the entry to patch")],
@@ -64,13 +74,3 @@ def delete(
         return {"deleted entry": entry}
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
-
-
-@router.post("/")
-def create(
-    entry: schemas.EntryCreate,
-    req=Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    entry = crud.create_user_entry(db=db, entry=entry, user_id=req["user_id"])
-    return {"entry": entry}

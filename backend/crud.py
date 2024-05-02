@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import json
 from fastapi import HTTPException
 from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
@@ -40,6 +41,7 @@ def get_user_by_email(db: Session, email: str):
 
 
 def create_user(db: Session, user: schemas.UserCreate):
+    user = dict(user)
     salt = bcrypt.gensalt()
     hashed_password = hash_password(user["password"], salt=salt)
     try:
@@ -74,6 +76,7 @@ def delete_user(db: Session, user_id: uuid.UUID):
 
 
 def create_user_entry(db: Session, entry: schemas.EntryCreate, user_id):
+    entry = dict(entry)
     content = encrypt(entry["content"]) if entry["content"] else None
     db_entry = models.Entry(
         title=entry["title"],
@@ -164,6 +167,7 @@ def patch_user_entry(db: Session, entry: schemas.EntryCreate, entry_id, user_id)
         raise HTTPException(
             status_code=401, detail=f"Cannot modify other user entries."
         )
+    entry = dict(entry)
     content = entry.get("content", None)
     db_entry.content = encrypt(content) if content else None
     db_entry.title = entry.get("title", None)
@@ -205,6 +209,8 @@ def delete_user_entry(db: Session, entry_id, user_id):
 
 
 def generate_prompt(db: Session, prompt: str, user_id):
+    user = get_user(db=db, user_id=user_id)
+
     if len(prompt) > 1000:
         raise HTTPException(
             status_code=400, detail="Prompts cannot be longer than 1000 characters."
@@ -220,17 +226,17 @@ def generate_prompt(db: Session, prompt: str, user_id):
         )
         .all()
     )
-
-    if len(recent_prompts) > OPEN_AI_REQUEST_PER_HOUR:
+    print(OPEN_AI_REQUEST_PER_HOUR)
+    if len(recent_prompts) >= OPEN_AI_REQUEST_PER_HOUR:
         raise HTTPException(
             status_code=429, detail="Too many request in past hour. Please wait."
         )
-    print("CLIENT", openai_client.chat, OPEN_AI_MODEL)
 
     try:
         response = openai_client.chat.completions.create(
             model=OPEN_AI_MODEL,
             temperature=0.8,
+            response_format="json",
             messages=[
                 {
                     "role": "system",
@@ -265,11 +271,12 @@ def generate_prompt(db: Session, prompt: str, user_id):
                 {"role": "user", "content": prompt},
             ],
         )
-        response_content = response.choices[0].message.content
-        print("RESP:", response, response_content)
+        response_dict = json.loads(response)
+        response_content = response_dict["choices"][0]["message"]["content"]
+        print("RESP:", response_dict, response_content)
         encrypted_prompt = encrypt(response_content)
         db_prompt = models.Prompt(
-            id=response.id,
+            id=response_dict["id"],
             content=encrypted_prompt,
             response=response_content,
             owner_id=user_id,

@@ -55,11 +55,11 @@ def create_token(
     adjusted_time = datetime.now(timezone.utc) + delta
     encode = {
         "sub": {
-            "email": data.email,
-            "first_name": data.first_name,
-            "last_name": data.last_name,
+            "email": data.__getattribute__("email"),
+            "first_name": data.__getattribute__("first_name"),
+            "last_name": data.__getattribute__("last_name"),
         },
-        "id": str(data.id),
+        "id": str(data.__getattribute__("id")),
         "exp": adjusted_time,
     }
     token = jwt.encode(
