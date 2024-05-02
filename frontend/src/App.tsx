@@ -58,8 +58,8 @@ function App() {
           <NavBar />
         </div>
         {isLoading ? (
-          <div className="pt-64">
-            <h1 className="text-primary-600 font-Raleway text-lg">
+          <div className="flex flex-col items-center justify-center gap-12 pt-64">
+            <h1 className="font-Raleway text-lg text-primary-600">
               Getting your journal ready...
             </h1>
             <svg
@@ -68,12 +68,12 @@ function App() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="h-14 w-14 animate-spin rounded-lg bg-primary-500 p-3 text-light-200"
+              className={`h-20 w-20 animate-spin rounded-full bg-primary-500 p-3 text-light-200`}
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
               />
             </svg>
           </div>
