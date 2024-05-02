@@ -30,10 +30,10 @@ OPEN_AI_MODEL = environ.get("OPEN_AI_MODEL")
 OPEN_AI_REQUEST_PER_HOUR = int(environ.get("OPEN_AI_REQUEST_PER_HOUR", 20))
 ENCRYPT_KEY = environ.get("ENCRYPT_KEY", "blahblahblah")
 ALLOWED_ORIGIN = environ.get("ALLOWED_ORIGIN", "*")
-DATABASE_URL = environ.get("DATABASE_URL", "postgresql:///journalai")
+DATABASE_URL = environ.get("DATABASE_URL", "postgresql:///jot_journal")
 
 if "pytest" in sys.modules:
-    DATABASE_URL = "postgresql:///test_journalai"
+    DATABASE_URL = "postgresql:///test_jot_journal"
 
 ### Printing Env variables on server start
 print("")
