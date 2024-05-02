@@ -236,7 +236,6 @@ def generate_prompt(db: Session, prompt: str, user_id):
         response = openai_client.chat.completions.create(
             model=OPEN_AI_MODEL,
             temperature=0.8,
-            response_format="json",
             messages=[
                 {
                     "role": "system",
@@ -271,12 +270,10 @@ def generate_prompt(db: Session, prompt: str, user_id):
                 {"role": "user", "content": prompt},
             ],
         )
-        response_dict = json.loads(response)
-        response_content = response_dict["choices"][0]["message"]["content"]
-        print("RESP:", response_dict, response_content)
+        response_content = response.choices[0].message.content
         encrypted_prompt = encrypt(response_content)
         db_prompt = models.Prompt(
-            id=response_dict["id"],
+            id=response.id,
             content=encrypted_prompt,
             response=response_content,
             owner_id=user_id,
@@ -288,4 +285,5 @@ def generate_prompt(db: Session, prompt: str, user_id):
 
         return response_content
     except Exception as err:
-        raise HTTPException(status_code=500, detail="Error generating prompt.")
+        print("ERRR", err)
+        raise HTTPException(status_code=400, detail="Error generating prompt.")

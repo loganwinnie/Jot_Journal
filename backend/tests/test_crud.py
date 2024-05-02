@@ -9,6 +9,7 @@ from _test_utilities import (
     create_fake_user,
     drop_and_recreate_tables,
     create_fake_entry,
+    create_fake_resp,
 )
 from crud import openai_client
 import config
@@ -458,6 +459,7 @@ class TestGeneratePrompt(TestCase):
         self.user = create_fake_user(db=self.db_session)
         self.other_user = create_fake_user(db=self.db_session, email="other@email.com")
         self.db_session.flush()
+        self.resp_object = create_fake_resp()
 
     def tearDown(self) -> None:
         self.db_session.rollback()
@@ -470,9 +472,7 @@ class TestGeneratePrompt(TestCase):
         "chat",
     )
     def test_works(self, mock_openai_client):
-        mock_openai_client.completions.create.return_value = (
-            '{"choices": [{"message": {"content": "test prompt"}}], "id": "1"}'
-        )
+        mock_openai_client.completions.create.return_value = self.resp_object
         prompt = crud.generate_prompt(
             db=self.db_session, prompt="test query", user_id=self.user.id
         )
@@ -485,9 +485,7 @@ class TestGeneratePrompt(TestCase):
     def test_404_invalid_user(self, mock_openai_client):
         fake_uuid = uuid.uuid4()
 
-        mock_openai_client.completions.create.return_value = (
-            '{"choices": [{"message": {"content": "test prompt"}}], "id": "1"}'
-        )
+        mock_openai_client.completions.create.return_value = self.resp_object
 
         with pytest.raises(
             HTTPException,
@@ -502,9 +500,7 @@ class TestGeneratePrompt(TestCase):
         "chat",
     )
     def test_entry_too_long(self, mock_openai_client):
-        mock_openai_client.completions.create.return_value = (
-            '{"choices": [{"message": {"content": "test prompt"}}], "id": "1"}'
-        )
+        mock_openai_client.completions.create.return_value = self.resp_object
         with pytest.raises(
             HTTPException,
             match="Prompts cannot be longer than 1000 characters.",
@@ -532,11 +528,8 @@ class TestGeneratePrompt(TestCase):
         ):
             count = 0
             while count <= config.OPEN_AI_REQUEST_PER_HOUR:
-                mock_openai_client.completions.create.return_value = (
-                    '{"choices": [{"message": {"content": "test prompt"}}], "id":'
-                    + f'"{count}"'
-                    + "}"
-                )
+                fake_resp = create_fake_resp(f"{count}")
+                mock_openai_client.completions.create.return_value = fake_resp
                 crud.generate_prompt(
                     db=self.db_session, prompt="test query", user_id=self.user.id
                 )

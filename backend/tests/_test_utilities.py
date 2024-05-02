@@ -42,3 +42,18 @@ def create_fake_entry(db, user, title="TestEntry"):
     )
     db.add(db_entry)
     return db_entry
+
+
+def create_fake_resp(id="1"):
+    class Empty:
+        pass
+
+    response = Empty()
+    choice = Empty()
+    message = Empty()
+    message.content = "test prompt"
+    choice.message = message
+    response.choices = [choice]
+    response.id = id
+
+    return response
