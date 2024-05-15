@@ -33,6 +33,7 @@ interface TokenInterface {
 function SignupForm() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<initialForm>(initialState);
+  const [error, setError] = useState<null | string>(null);
   const [signup] = useSignupMutation();
   const dispatch = useDispatch();
 
@@ -50,10 +51,10 @@ function SignupForm() {
       setFormData(initialState);
       navigate("/");
       dispatch(setToken({ token }));
-    } catch (errs) {
-      console.log(errs);
-      if (errs instanceof Array) {
-        // displayErrors(errs)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      if (typeof err.data.detail === "string") {
+        setError(err.data.detail);
       }
     }
   }
@@ -63,7 +64,7 @@ function SignupForm() {
       <h2 className="mb-4 font-Raleway text-2xl font-semibold text-dark-500">
         Signup
       </h2>
-
+      {error && <p className="text-red-600">{error}</p>}
       <form
         onSubmit={handleSubmit}
         className="flex w-full flex-col items-center justify-between gap-4 border-b-2"

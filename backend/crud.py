@@ -46,7 +46,7 @@ def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = hash_password(user["password"], salt=salt)
     try:
         db_user = models.User(
-            email=user["email"],
+            email=user["email"].lower(),
             password=str(hashed_password, "utf-8"),
             first_name=user["first_name"],
             last_name=user["last_name"],

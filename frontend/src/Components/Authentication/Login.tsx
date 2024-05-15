@@ -25,6 +25,7 @@ interface TokenInterface {
  */
 function LoginForm() {
   const [login] = useLoginMutation();
+  const [error, setError] = useState<null | string>(null);
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState<initialForm>({
@@ -45,9 +46,10 @@ function LoginForm() {
       const token: TokenInterface = await login(formData).unwrap();
       setFormData({ username: "", password: "" });
       dispatch(setToken({ token }));
-    } catch (err) {
-      if (err instanceof Array) {
-        //   setErrors(err);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      if (typeof err.data.detail === "string") {
+        setError(err.data.detail);
       }
     }
   }
@@ -57,6 +59,7 @@ function LoginForm() {
       <h2 className="font-Raleway text-2xl font-semibold text-dark-500">
         Login
       </h2>
+      {error && <p className="text-red-600">{error}</p>}
       <form
         onSubmit={handleSubmit}
         className="flex w-full flex-col items-center justify-between gap-4 border-b-2"

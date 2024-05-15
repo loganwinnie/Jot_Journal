@@ -17,7 +17,9 @@ router = APIRouter(
 
 @router.post("/register")
 def create(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.email == user.email).first()
+    db_user = (
+        db.query(models.User).filter(models.User.email == user.email.lower()).first()
+    )
     if db_user:
         raise HTTPException(
             status_code=400, detail="An account already exists with this email."
@@ -31,7 +33,7 @@ async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db),
 ):
-    db_user = crud.get_user_by_email(db=db, email=form_data.username)
+    db_user = crud.get_user_by_email(db=db, email=form_data.username.lower())
     if not db_user:
         raise HTTPException(
             status_code=400, detail=f"No account with email {form_data.username}"
